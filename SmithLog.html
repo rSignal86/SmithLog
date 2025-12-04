@@ -1,0 +1,359 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cabrillo → ADIF (QRZ-ready)</title>
+<style>
+  :root {
+    --bg:#0f0f12; --fg:#e8e8ea; --muted:#9aa0a6; --accent:#4aa3ff; --danger:#ff6b6b; --ok:#78c48c;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --sans: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  }
+  body { margin:0; background:var(--bg); color:var(--fg); font-family:var(--sans); }
+  header { padding:10px 14px; border-bottom:1px solid #1e1e24; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  header .app-title { font-weight:600; margin-right:auto; }
+  .btn { background:#1a1e24; color:var(--fg); border:1px solid #2a2f39; padding:6px 10px; border-radius:6px; cursor:pointer; font-size:14px; }
+  .btn:hover { border-color:#3a4050; }
+  .btn.primary { border-color:var(--accent); color:#fff; }
+  .btn.danger { border-color:var(--danger); }
+  .container { padding:14px; display:grid; grid-template-columns:1fr; gap:12px; max-width:1100px; margin:0 auto; }
+  section { background:#121417; border:1px solid #1e222b; border-radius:10px; padding:12px; }
+  section h2 { margin:0 0 8px 0; font-size:16px; font-weight:600; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; }
+  .file-input { display:flex; align-items:center; gap:8px; }
+  input[type=file] { color:var(--muted); }
+  textarea { width:100%; min-height:200px; background:#0c0e11; color:var(--fg); border:1px solid #1e222b; border-radius:8px; padding:10px; font-family:var(--mono); font-size:13px; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .field { display:flex; flex-direction:column; gap:4px; }
+  .field label { font-size:13px; color:var(--muted); }
+  .field input, .field select { background:#0c0e11; color:var(--fg); border:1px solid #1e222b; border-radius:8px; padding:8px; font-size:14px; }
+  .summary { font-family:var(--mono); font-size:13px; color:var(--muted); }
+  table { width:100%; border-collapse:collapse; font-family:var(--mono); font-size:12px; }
+  th, td { border-bottom:1px solid #1e222b; padding:6px; text-align:left; }
+  th { color:#aeb4bb; font-weight:600; }
+  .note { color:var(--muted); font-size:12px; }
+  .ok { color:var(--ok); }
+  .warn { color:#f1c40f; }
+  .err { color:var(--danger); }
+  .kbd { background:#1a1e24; color:#fff; border:1px solid #2a2f39; border-radius:4px; padding:0 4px; font-family:var(--mono); font-size:12px; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="app-title">Cabrillo → ADIF (QRZ-ready)</div>
+    <button id="btnLoad" class="btn" title="Load Cabrillo (ENTER)">Load Cabrillo <span class="kbd">ENTER</span></button>
+    <button id="btnAnalyze" class="btn" title="Analyze (SPACE)">Analyze <span class="kbd">SPACE</span></button>
+    <button id="btnDownload" class="btn primary" title="Download ADIF (F10)">Download ADIF <span class="kbd">F10</span></button>
+    <button id="btnHelp" class="btn" title="Help (F9)">Help <span class="kbd">F9</span></button>
+    <button id="btnRefresh" class="btn" title="Re-parse input">Refresh Data</button>
+    <button id="btnClear" class="btn danger" title="Clear all">Clear All</button>
+  </header>
+
+  <div class="container">
+    <section>
+      <h2>Cabrillo Input</h2>
+      <div class="row file-input">
+        <input id="file" type="file" accept=".txt,.log,.cab" />
+        <span class="note">or paste Cabrillo content below</span>
+      </div>
+      <textarea id="paste" placeholder="Paste your Cabrillo content here"></textarea>
+      <div id="summary" class="summary">Load and press <span class="kbd">SPACE</span> to analyze…</div>
+    </section>
+
+    <section>
+      <h2>Parameters (optional)</h2>
+      <div class="grid">
+        <div class="field">
+          <label for="contest">Contest (dropdown)</label>
+          <select id="contest">
+            <option value="">— None —</option>
+            <option value="CQ-WW-CW">CQ-WW-CW</option>
+            <option value="CQ-WW-SSB">CQ-WW-SSB</option>
+            <option value="CQ-WPX-CW">CQ-WPX-CW</option>
+            <option value="CQ-WPX-SSB">CQ-WPX-SSB</option>
+            <option value="ARRL-DX">ARRL-DX</option>
+            <option value="IARU-HF">IARU-HF</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="comment">Comment (global, optional)</label>
+          <input id="comment" type="text" placeholder="Global comment for all QSOs (optional)" />
+        </div>
+        <div class="field">
+          <label for="txpwr">TX Power (W, optional)</label>
+          <input id="txpwr" type="number" inputmode="numeric" placeholder="Transmit power in watts (optional)" />
+        </div>
+      </div>
+      <div class="note">Frequencies are preserved exactly as in Cabrillo; there is no UI to modify them.</div>
+    </section>
+
+    <section>
+      <h2>Preview</h2>
+      <div id="previewSummary" class="summary"></div>
+      <table id="previewTable" aria-label="Preview table (first 10 QSOs)">
+        <thead>
+          <tr>
+            <th>CALL</th><th>DATE</th><th>TIME</th><th>FREQ</th><th>BAND</th><th>MODE</th><th>RST_S</th><th>RST_R</th><th>EXCH_S</th><th>EXCH_R</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div id="messages" class="summary"></div>
+    </section>
+  </div>
+
+  <dialog id="helpDlg">
+    <form method="dialog">
+      <p><strong>How to use</strong></p>
+      <ol>
+        <li>Load a Cabrillo .txt file (or paste its content), then press <span class="kbd">SPACE</span> to Analyze.</li>
+        <li>Optionally set <em>Contest</em> (dropdown), <em>Comment</em>, and <em>TX Power</em>.</li>
+        <li>Press <span class="kbd">F10</span> to Download the ADIF file and import it into QRZ.</li>
+      </ol>
+      <p><strong>Notes</strong></p>
+      <ul>
+        <li>Frequency strings are preserved exactly as in Cabrillo.</li>
+        <li>Contest serials are auto-mapped to <code>STX</code>/<code>SRX</code> when numeric; exchange text is kept in <code>STX_STRING</code>/<code>SRX_STRING</code>.</li>
+        <li>Selecting CQ-WW in the dropdown adds <code>MY_CQ_ZONE</code>/<code>CQZ</code> from the exchange.</li>
+      </ul>
+      <menu>
+        <button class="btn">Close</button>
+      </menu>
+    </form>
+  </dialog>
+
+<script>
+(function(){
+  const fileEl = document.getElementById('file');
+  const pasteEl = document.getElementById('paste');
+  const summaryEl = document.getElementById('summary');
+  const previewSummaryEl = document.getElementById('previewSummary');
+  const previewBodyEl = document.querySelector('#previewTable tbody');
+  const messagesEl = document.getElementById('messages');
+  const helpDlg = document.getElementById('helpDlg');
+
+  const contestEl = document.getElementById('contest');
+  const commentEl = document.getElementById('comment');
+  const txpwrEl = document.getElementById('txpwr');
+
+  let cabrilloText = '';
+  let parsed = { header:{}, qsos:[] };
+
+  document.getElementById('btnLoad').addEventListener('click', ()=>{
+    fileEl.click();
+    pasteEl.focus();
+  });
+  document.getElementById('btnAnalyze').addEventListener('click', analyze);
+  document.getElementById('btnDownload').addEventListener('click', downloadADIF);
+  document.getElementById('btnHelp').addEventListener('click', ()=> helpDlg.showModal());
+  document.getElementById('btnRefresh').addEventListener('click', ()=> analyze());
+  document.getElementById('btnClear').addEventListener('click', ()=>{
+    fileEl.value=''; pasteEl.value=''; cabrilloText=''; parsed={header:{}, qsos:[]};
+    summaryEl.textContent='Load and press SPACE to analyze…';
+    previewSummaryEl.textContent=''; previewBodyEl.innerHTML=''; messagesEl.textContent='';
+    contestEl.value=''; commentEl.value=''; txpwrEl.value='';
+  });
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter'){ e.preventDefault(); fileEl.click(); }
+    if(e.key===' '){ e.preventDefault(); analyze(); }
+    if(e.key==='F10'){ e.preventDefault(); downloadADIF(); }
+    if(e.key==='F9'){ e.preventDefault(); helpDlg.showModal(); }
+  });
+
+  fileEl.addEventListener('change', async (e)=>{
+    const f = e.target.files?.[0]; if(!f) return;
+    const txt = await f.text();
+    pasteEl.value = txt; cabrilloText = txt;
+    summaryEl.textContent = 'File loaded. Press SPACE to analyze.';
+  });
+
+  pasteEl.addEventListener('input', ()=>{
+    cabrilloText = pasteEl.value;
+  });
+
+  function analyze(){
+    if(!cabrilloText.trim()){
+      summaryEl.textContent = 'Please load or paste Cabrillo and press SPACE to analyze.';
+      return;
+    }
+    parsed = parseCabrillo(cabrilloText);
+    const h = parsed.header;
+    const bands = [...new Set(parsed.qsos.map(q=>q.BAND).filter(Boolean))];
+    summaryEl.innerHTML = `Station Callsign: ${esc(h.CALLSIGN||'—')} · Operator: ${esc((h.OPERATORS||'').split(/\s+/)[0]||'—')} · Detected Contest (Cabrillo): ${esc(h.CONTEST||'—')}<br>QSOs: ${parsed.qsos.length} · Bands: ${bands.join(', ')||'—'}`;
+
+    previewBodyEl.innerHTML = '';
+    const show = parsed.qsos.slice(0,10);
+    for(const r of show){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${esc(r.CALL)}</td><td>${esc(r.QSO_DATE)}</td><td>${esc(r.TIME_ON)}</td><td>${esc(r.FREQ_RAW)}</td><td>${esc(r.BAND||'')}</td><td>${esc(r.MODE)}</td><td>${esc(r.RST_SENT)}</td><td>${esc(r.RST_RCVD)}</td><td>${esc(r.STX_STRING||'')}</td><td>${esc(r.SRX_STRING||'')}</td>`;
+      previewBodyEl.appendChild(tr);
+    }
+
+    const infos = [];
+    const weird = parsed.qsos.filter(q=>/[^A-Z0-9]/.test(q.CALL||''));
+    if(weird.length){ infos.push(`Unusual callsigns detected: ${weird.slice(0,5).map(q=>q.CALL).join(', ')}…`); }
+    infos.push('Frequency strings preserved as-is.');
+    const hasSerial = parsed.qsos.some(q=>q.STX || q.SRX);
+    if(hasSerial) infos.push('Serials detected and mapped to STX/SRX; full exchange kept in STX_STRING/SRX_STRING.');
+    messagesEl.textContent = infos.join(' | ');
+  }
+
+  function downloadADIF(){
+    if(!parsed.qsos.length){ analyze(); if(!parsed.qsos.length){ return; } }
+    const contestId = contestEl.value.trim();
+    const comment = commentEl.value || '';
+    const txpwr = txpwrEl.value || '';
+    const adif = buildADIF(parsed, {contestId, comment, txpwr});
+    const blob = new Blob([adif], {type:'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = (parsed.header.CALLSIGN? parsed.header.CALLSIGN+'_':'') + 'export.adi';
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  }
+
+  function parseCabrillo(text){
+    const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length);
+    const header = {}; const qsos = [];
+    for(const ln of lines){
+      if(/^QSO:/i.test(ln)){
+        qsos.push(ln);
+      } else if(/:\s*/.test(ln)){
+        const idx = ln.indexOf(':');
+        const key = ln.slice(0,idx).trim().toUpperCase();
+        const val = ln.slice(idx+1).trim();
+        header[key] = val;
+      }
+    }
+    const recs = [];
+    for(const ln of qsos){
+      const parts = ln.split(/\s+/);
+      // Expect at least: QSO: freq mode yyyy-mm-dd hhmm mycall rst_s exch_s theircall rst_r exch_r
+      if(parts.length < 11 || parts[0].toUpperCase()!=='QSO:') continue;
+      const [, freqRaw, modeRaw, dateRaw, timeRaw, mycall, rst_s, stx, theircall, rst_r, srx] = parts;
+      const mode = normalizeMode(modeRaw);
+      const qso_date = (dateRaw||'').replace(/-/g,'');
+      const time_on = (timeRaw||'').length===4 ? (timeRaw+"00") : (timeRaw.padEnd(6,'0').slice(0,6));
+      const band = deriveBandFromKHz(freqRaw);
+      const stxNum = extractSerial(stx);
+      const srxNum = extractSerial(srx);
+      const rec = {
+        CALL: theircall?.toUpperCase()||'',
+        QSO_DATE: qso_date,
+        TIME_ON: time_on,
+        FREQ_RAW: freqRaw, // preserved verbatim
+        BAND: band,
+        MODE: mode,
+        RST_SENT: rst_s||'',
+        RST_RCVD: rst_r||'',
+        STX_STRING: stx||'',
+        SRX_STRING: srx||'',
+        STX: stxNum,
+        SRX: srxNum,
+        MYCQZONE: undefined,
+        CQZ: undefined,
+      };
+      recs.push(rec);
+    }
+    return { header, qsos: recs };
+  }
+
+  function normalizeMode(m){
+    const t = (m||'').toUpperCase();
+    const map = { 'CW':'CW', 'SSB':'SSB', 'USB':'SSB', 'LSB':'SSB', 'RTTY':'RTTY', 'FM':'FM', 'AM':'AM', 'FT8':'FT8', 'FT4':'FT4', 'PSK':'PSK', 'PSK31':'PSK31' };
+    return map[t] || t;
+  }
+
+  function deriveBandFromKHz(freqRaw){
+    const k = parseFloat(freqRaw);
+    if(!isFinite(k)) return '';
+    const mhz = k/1000.0;
+    const bands = [
+      [1.8, 2.0, '160m'],[3.5,4.0,'80m'],[5.3,5.4,'60m'],[7.0,7.3,'40m'],[10.1,10.15,'30m'],[14.0,14.35,'20m'],[18.068,18.168,'17m'],[21.0,21.45,'15m'],[24.89,24.99,'12m'],[28.0,29.7,'10m'],[50.0,54.0,'6m']
+    ];
+    for(const [lo,hi,b] of bands){ if(mhz>=lo && mhz<=hi) return b; }
+    return '';
+  }
+
+  function extractSerial(x){
+    // Extract last integer token in the exchange (e.g., '599 023' -> '023', '14' -> '14')
+    if(!x) return undefined;
+    const m = x.match(/(\d{1,5})$/);
+    return m ? m[1] : undefined;
+  }
+
+  function buildADIF(parsed, opts){
+    const {contestId, comment, txpwr} = opts;
+    const h = parsed.header;
+    const station = h.CALLSIGN||'';
+    const operator = (h.OPERATORS||'').split(/\s+/)[0]||'';
+    let out = '';
+    out += '# ADIF export generated by Cabrillo→ADIF (single-file app)\n';
+    // Header record
+    const hdrFields = [];
+    addTag(hdrFields, 'adif_ver', '3.1.0');
+    addTag(hdrFields, 'programid', 'Cabrillo2ADIF');
+    addTag(hdrFields, 'programversion', '1.0');
+    if(station) addTag(hdrFields, 'station_callsign', station);
+    if(operator) addTag(hdrFields, 'operator', operator);
+    if(contestId) addTag(hdrFields, 'contest_id', contestId);
+    out += hdrFields.join(' ') + ' <eoh>\n';
+
+    for(const r of parsed.qsos){
+      const fields = [];
+      addTag(fields, 'station_callsign', station);
+      addTag(fields, 'operator', operator);
+      addTag(fields, 'call', r.CALL);
+      addTag(fields, 'qso_date', r.QSO_DATE);
+      addTag(fields, 'time_on', r.TIME_ON);
+      addTag(fields, 'freq', r.FREQ_RAW); // verbatim from Cabrillo
+      if(r.BAND) addTag(fields, 'band', r.BAND);
+      addTag(fields, 'mode', r.MODE);
+      addTag(fields, 'rst_sent', r.RST_SENT);
+      addTag(fields, 'rst_rcvd', r.RST_RCVD);
+      if(r.STX_STRING) addTag(fields, 'stx_string', r.STX_STRING);
+      if(r.SRX_STRING) addTag(fields, 'srx_string', r.SRX_STRING);
+
+      // Contest-aware mapping
+      if(contestId){
+        addTag(fields, 'contest_id', contestId);
+        if(/^CQ-WW-(CW|SSB)$/i.test(contestId)){
+          // Treat exchange as zone number when numeric
+          const myZone = r.STX || undefined;
+          const theirZone = r.SRX || undefined;
+          if(myZone) addTag(fields, 'my_cq_zone', myZone);
+          if(theirZone) addTag(fields, 'cqz', theirZone);
+          // Also put zones into STX/SRX (for QRZ serial visibility)
+          if(myZone) addTag(fields, 'stx', myZone);
+          if(theirZone) addTag(fields, 'srx', theirZone);
+        } else if(/WPX/i.test(contestId)){
+          // WPX serial numbers
+          if(r.STX) addTag(fields, 'stx', r.STX);
+          if(r.SRX) addTag(fields, 'srx', r.SRX);
+        } else {
+          // Generic: if numeric serials present, include them
+          if(r.STX) addTag(fields, 'stx', r.STX);
+          if(r.SRX) addTag(fields, 'srx', r.SRX);
+        }
+      } else {
+        // No contest selected, still include STX/SRX if numeric (useful for logging)
+        if(r.STX) addTag(fields, 'stx', r.STX);
+        if(r.SRX) addTag(fields, 'srx', r.SRX);
+      }
+
+      if(comment) addTag(fields, 'comment', comment);
+      if(txpwr) addTag(fields, 'tx_pwr', String(txpwr));
+
+      out += fields.join(' ') + ' <eor>\n';
+    }
+    return out;
+  }
+
+  function addTag(arr, tag, val){ if(val===undefined || val===null) return; const v = String(val); arr.push(`<${tag}:${v.length}>${v}`); }
+  function esc(s){ return String(s).replace(/[&<>]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+})();
+</script>
+</body>
+</html>
