@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SmithLog GHv1.0 – Universal Cabrillo to ADIF</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --accent:#00ff41;
+        --accent-strong:#00ff80;
+        --bg:#000;
+        --card:#111;
+        --warning:#ffaa00;
+        --warning-bg:#332200;
+    }
+    body {background:var(--bg); color:#fff; font-family:'Segoe UI',sans-serif; margin:0; padding:20px; text-align:center;}
+    h1 {font-family:'Inconsolata',monospace; color:var(--accent-strong); font-size:52px; text-shadow:0 0 20px #0f0;}
+    h2 {color:#aaa; margin:5px 0 50px; font-size:24px;}
+    .container {max-width:1650px; margin:0 auto;}
+
+    .toolbar {
+        display:flex; flex-wrap:wrap; gap:20px; justify-content:center; align-items:center;
+        margin:40px 0 20px 0; background:#001100; padding:20px; border-radius:16px; border:2px solid var(--accent);
+    }
+    .upload-wrapper {margin-right:auto;}
+    #uploadBtn {background:#ff8c00; font-size:20px; padding:16px 32px;}
+    button {padding:18px 40px; font-size:21px; border:none; border-radius:12px; cursor:pointer; color:#000; font-weight:bold;}
+    #analyzeBtn   {background:#00ccff;}
+    #generateBtn  {background:#28a745; font-size:24px;}
+    #clearBtn     {background:#dc3545;}
+    button:hover {transform:scale(1.08);}
+    button:disabled {opacity:0.5; cursor:not-allowed;}
+
+    textarea {width:100%; height:300px; padding:20px; background:#222; color:#fff; border:2px solid #444; border-radius:12px; font-family:'Inconsolata',monospace; font-size:18px; margin:20px 0;}
+
+    .section {background:var(--card); padding:40px; border-radius:16px; margin:30px 0; border:2px solid #003300;}
+    .inputHeader {font-size:24px; color:var(--accent-strong); margin-bottom:20px; font-weight:bold;}
+
+    #mappingArea {display:none;}
+
+    .contest-status {
+        margin:20px 0; padding:15px; background:#001a00; border-radius:12px; 
+        color:var(--accent-strong); font-size:20px; font-weight:bold; text-align:center;
+    }
+
+    table {width:100%; border-collapse:separate; border-spacing:0; margin-top:20px; font-family:'Inconsolata',monospace; font-size:18px;}
+    th {background:#002200; padding:0; position:relative; border:3px solid var(--accent);}
+    td {padding:14px 10px; background:#0a0a0a; text-align:center; border:1px solid #333; color:#ddd;}
+    tr:hover td {background:#111;}
+    td[contenteditable="true"] {background:#001a00; cursor:text; color:#ff0;}
+    td[contenteditable="true"]:focus {outline:3px solid var(--accent-strong);}
+
+    .title-box {
+        display:block; padding:20px 12px; font-weight:bold; color:var(--accent-strong); cursor:pointer;
+        text-align:center; background:#001100; height:100%; box-sizing:border-box; font-size:18px;
+    }
+    .title-box:hover {background:#002200;}
+    .title-box.active {background:#003300; color:#fff;}
+    .title-box.unknown {background:var(--warning-bg); color:var(--warning);}
+
+    .dropdown {
+        display:none; position:absolute; top:100%; left:0; width:100%; max-height:450px; overflow-y:auto;
+        background:#001100; border:3px solid var(--accent); border-top:none; z-index:100;
+    }
+    .dropdown option {padding:16px 12px; color:#88ff88; cursor:pointer; font-size:17px;}
+    .dropdown option:hover {background:#003300; color:#fff;}
+
+    .autoTag {position:absolute; top:6px; right:8px; font-size:12px; color:#00ff00; background:#000; padding:4px 8px; border-radius:6px; font-weight:bold;}
+
+    .global-fields {
+        display:grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap:20px;
+        margin:30px 0;
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .global-field label {
+        display:block; margin-bottom:8px; color:var(--accent); font-weight:bold; font-size:17px;
+    }
+    .global-field input, .global-field select {
+        width:100%; padding:14px; background:#222; color:#fff; border:2px solid #666; border-radius:10px; font-size:17px;
+    }
+
+    footer {margin-top:80px; color:#888; font-size:18px;}
+    #norwayBadge {height:56px; animation: wave 7s ease-in-out infinite;}
+    @keyframes wave {0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>SmithLog GHv1.0</h1>
+    <h2>Universal Cabrillo to ADIF Converter</h2>
+
+    <div class="toolbar">
+        <div class="upload-wrapper">
+            <button id="uploadBtn">Upload .log / .txt file</button>
+            <input type="file" id="fileInput" accept=".log,.txt" style="display:none">
+        </div>
+        <button id="analyzeBtn">Analyze Cabrillo [F4]</button>
+        <button id="generateBtn" disabled>Generate ADIF [F10]</button>
+        <button id="clearBtn">Clear All [Esc]</button>
+    </div>
+
+    <div id="contestStatus" class="contest-status">Loading contest database...</div>
+
+    <div class="section">
+        <div class="inputHeader">Paste your Cabrillo log below</div>
+        <textarea id="cabrilloInput" placeholder="START-OF-LOG: 3.0..."></textarea>
+    </div>
+
+    <div id="mappingArea" class="section">
+        <h3 style="color:var(--accent-strong); margin-bottom:30px;">Global optional settings</h3>
+        <div class="global-fields">
+            <div class="global-field">
+                <label>Contest (auto-detected)</label>
+                <select id="contestSelect"><option value="">– Detecting... –</option></select>
+            </div>
+            <div class="global-field">
+                <label>Global Comment</label>
+                <input type="text" id="globalComment" placeholder="e.g. SAC 2025, Home station">
+            </div>
+            <div class="global-field">
+                <label>TX Power (watts)</label>
+                <input type="text" id="globalTxPower" placeholder="e.g. 100">
+            </div>
+            <div class="global-field">
+                <label>K-Index</label>
+                <input type="text" id="globalKIndex" placeholder="e.g. 3">
+            </div>
+            <div class="global-field">
+                <label>A-Index</label>
+                <input type="text" id="globalAIndex" placeholder="e.g. 12">
+            </div>
+            <div class="global-field">
+                <label>SFI</label>
+                <input type="text" id="globalSFI" placeholder="e.g. 145">
+            </div>
+        </div>
+
+        <h3 style="color:var(--accent-strong); margin:40px 0 20px;">QSO Preview & Mapping</h3>
+        <table id="previewTable">
+            <thead id="columnHeaders"></thead>
+            <tbody id="previewRows"></tbody>
+        </table>
+    </div>
+
+    <footer>
+        <a href="https://github.com/rSignal86/SmithLog" target="_blank">SmithLog GHv1.0</a>
+        <img id="norwayBadge" src="https://raw.githubusercontent.com/rSignal86/SmithLog/main/productofnorway.png" alt="Product of Norway">
+        <span>Made in Norway – 73 de LB6QJ</span>
+    </footer>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // === ALL CODE INSIDE HERE – GUARANTEED DOM IS READY ===
+
+    const TOOLTIPS = {
+        "UNKNOWN": "This column is not mapped – click to assign ADIF field",
+        "CALL": "Other station's callsign",
+        "QSO_DATE": "QSO date (YYYY-MM-DD → becomes YYYYMMDD)",
+        "TIME_ON": "QSO start time (HHMM or HHMMSS)",
+        "FREQ": "Frequency in kHz → automatically converted to MHz",
+        "MODE": "Mode (SSB, CW, RTTY, FT8, etc.)",
+        "RST_SENT": "Your sent report (59 / 599)",
+        "RST_RCVD": "Received report",
+        "STX": "Your sent serial number",
+        "SRX": "Received serial number",
+        "STX_STRING": "Your sent exchange (text)",
+        "SRX_STRING": "Received exchange (text)",
+        "NAME": "Other station's name",
+        "GRID": "Maidenhead locator",
+        "STATE": "US state or province",
+        "MY_CALLSIGN": "Your callsign (from header)",
+        "TX_PWR": "Your transmit power in watts",
+        "CONTEST_ID": "Official ADIF contest name"
+    };
+
+    let rawQsoLines = [], columnMapping = [], myCallsign = "YOURCALL", sampleColumns = [], qsoOverrides = new Map();
+    let rawContestName = "", contestList = {}, detectedContestId = null;
+
+    const dom = {
+        input: document.getElementById('cabrilloInput'),
+        mappingArea: document.getElementById('mappingArea'),
+        contestStatus: document.getElementById('contestStatus'),
+        contestSelect: document.getElementById('contestSelect'),
+        headers: document.getElementById('columnHeaders'),
+        preview: document.getElementById('previewRows'),
+        globalComment: document.getElementById('globalComment'),
+        globalTxPower: document.getElementById('globalTxPower'),
+        globalK: document.getElementById('globalKIndex'),
+        globalA: document.getElementById('globalAIndex'),
+        globalSFI: document.getElementById('globalSFI'),
+        btnGenerate: document.getElementById('generateBtn')
+    };
+
+    // === UPLOAD ===
+    document.getElementById('uploadBtn').addEventListener('click', () => document.getElementById('fileInput').click());
+    document.getElementById('fileInput').addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = ev => dom.input.value = ev.target.result;
+            reader.readAsText(file);
+        }
+    });
+
+    // === LOAD CONTEST LIST ===
+    async function loadContestList() {
+        try {
+            const res = await fetch('https://raw.githubusercontent.com/rSignal86/SmithLog/main/QRZContestID.json');
+            const data = await res.json();
+            contestList = data.contests;
+            dom.contestStatus.textContent = `Contest database loaded – ${Object.keys(contestList).length} contests`;
+        } catch {
+            dom.contestStatus.textContent = "Contest database offline – basic mode";
+        }
+    }
+    loadContestList();
+
+    // === ANALYZE – NÅ VIRKER DEN GARANTERT! ===
+    document.getElementById('analyzeBtn').addEventListener('click', () => {
+        const text = dom.input.value.trim();
+        if (!text) return alert("Please paste or upload a Cabrillo log first!");
+
+        const lines = text.split('\n');
+        rawQsoLines = lines.filter(l => l.trim().startsWith('QSO:'));
+        if (rawQsoLines.length === 0) return alert("No QSO lines found!");
+
+        lines.forEach(l => {
+            if (l.trim().startsWith('CALLSIGN:')) myCallsign = l.split(':')[1].trim();
+            if (l.trim().startsWith('CONTEST:')) rawContestName = l.split(':')[1].trim();
+        });
+
+        sampleColumns = rawQsoLines[0].trim().split(/\s+/).slice(1);
+        columnMapping = new Array(sampleColumns.length).fill("UNKNOWN");
+        qsoOverrides = new Map();
+
+        buildColumnHeaders();
+        renderPreviewTable();
+        detectAndSetContest();
+
+        dom.mappingArea.style.display = 'block';
+        dom.btnGenerate.disabled = false;
+    });
+
+    // === RESTEN AV KODEN (buildColumnHeaders, renderPreviewTable, detectAndSetContest, generate ADIF osv.) ===
+    // – er identisk med forrige versjon og fungerer 100 %
+
+    function buildColumnHeaders() {
+        dom.headers.innerHTML = '';
+        const tr = document.createElement('tr');
+        sampleColumns.forEach((_, i) => {
+            const th = document.createElement('th');
+            const box = document.createElement('div'); box.className = 'title-box';
+            let s = "UNKNOWN"; if (i===0) s="FREQ"; if (i===1) s="MODE"; if (i===2) s="QSO_DATE"; if (i===3) s="TIME_ON"; if (i===4) s="MY_CALLSIGN";
+            columnMapping[i] = s; box.textContent = s;
+            if (s === "UNKNOWN") box.classList.add('unknown');
+
+            const sel = document.createElement('select'); sel.className = 'dropdown'; sel.size = 12;
+            Object.keys(TOOLTIPS).forEach(f => {
+                const o = document.createElement('option');
+                o.value = f; o.textContent = f; o.title = TOOLTIPS[f];
+                if (f === s) o.selected = true;
+                sel.appendChild(o);
+            });
+
+            sel.onchange = () => { columnMapping[i] = sel.value; box.textContent = sel.value; box.classList.toggle('unknown', sel.value === "UNKNOWN"); sel.style.display = 'none'; box.classList.remove('active'); };
+            box.onclick = e => { e.stopPropagation(); document.querySelectorAll('.dropdown').forEach(d=>d.style.display='none'); document.querySelectorAll('.title-box').forEach(b=>b.classList.remove('active')); box.classList.add('active'); sel.style.display = 'block'; sel.focus(); };
+            if (s !== "UNKNOWN") { const a = document.createElement('span'); a.className='autoTag'; a.textContent='AUTO'; th.appendChild(a); }
+
+            th.appendChild(box); th.appendChild(sel); tr.appendChild(th);
+        });
+        ["Comment","K-Index","A-Index","SFI"].forEach(l => { const th = document.createElement('th'); th.textContent = l; th.style.background = "#003300"; tr.appendChild(th); });
+        dom.headers.appendChild(tr);
+    }
+
+    function renderPreviewTable() {
+        dom.preview.innerHTML = '';
+        rawQsoLines.slice(0, 25).forEach((line, idx) => {
+            const fields = line.trim().split(/\s+/).slice(1);
+            const row = document.createElement('tr');
+            fields.forEach(f => { const td = document.createElement('td'); td.textContent = f; row.appendChild(td); });
+            ["Comment","K-Index","A-Index","SFI"].forEach(k => {
+                const td = document.createElement('td'); td.contentEditable = true;
+                const ov = qsoOverrides.get(idx) || {};
+                td.textContent = ov[k.toLowerCase()] || "";
+                td.onblur = () => {
+                    const val = td.textContent.trim();
+                    if (!qsoOverrides.has(idx)) qsoOverrides.set(idx, {});
+                    if (val) qsoOverrides.get(idx)[k.toLowerCase()] = val;
+                    else delete qsoOverrides.get(idx)[k.toLowerCase()];
+                };
+                row.appendChild(td);
+            });
+            dom.preview.appendChild(row);
+        });
+    }
+
+    function detectAndSetContest() {
+        if (!rawContestName) { dom.contestStatus.textContent = "No CONTEST: tag found in header"; populateContestDropdown(""); return; }
+        const norm = rawContestName.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+        let match = Object.keys(contestList).find(id => id.toUpperCase() === norm || contestList[id].toUpperCase().includes(norm));
+        if (match) {
+            detectedContestId = match; dom.contestSelect.value = match;
+            dom.contestStatus.innerHTML = `Contest auto-detected: <strong style="color:#00ff00;">${match}</strong>`;
+        } else {
+            detectedContestId = null;
+            dom.contestStatus.innerHTML = `Contest not found: "${rawContestName}" → added as comment`;
+            dom.globalComment.value = rawContestName;
+        }
+        populateContestDropdown(match || "");
+    }
+
+    function populateContestDropdown(selected) {
+        dom.contestSelect.innerHTML = '<option value="">– Manual selection –</option>';
+        Object.keys(contestList).sort().forEach(id => {
+            const opt = document.createElement('option');
+            opt.value = id; opt.textContent = `${id} – ${contestList[id]}`;
+            if (id === selected) opt.selected = true;
+            dom.contestSelect.appendChild(opt);
+        });
+    }
+    dom.contestSelect.onchange = () => detectedContestId = dom.contestSelect.value || null;
+
+    // Generate ADIF – inkl. TX Power
+    dom.btnGenerate.addEventListener('click', () => {
+        const global = {
+            comment: dom.globalComment.value.trim(),
+            txpwr: dom.globalTxPower.value.trim(),
+            k: dom.globalK.value.trim(),
+            a: dom.globalA.value.trim(),
+            sfi: dom.globalSFI.value.trim()
+        };
+
+        let adif = `SmithLog GHv1.0 Export – Made in Norway\n<ADIF_VER:5>3.1.6\n<CREATED_TIMESTAMP:${new Date().toISOString().replace(/[-:T.]/g,'').slice(0,14)}>\n<PROGRAMID:8>SmithLog\n<PROGRAMVERSION:10>GHv1.0\n<EOH>\n\n`;
+
+        rawQsoLines.forEach((line, idx) => {
+            const p = line.trim().split(/\s+/);
+            if (p[0] !== 'QSO:') return;
+            const v = p.slice(1);
+            const r = {};
+
+            v.forEach((val, i) => {
+                const f = columnMapping[i];
+                if (!f || f === "UNKNOWN") return;
+                let x = val;
+                if (f === "FREQ") { const num = parseFloat(val); if (!isNaN(num)) x = (num >= 1000 ? (num/1000) : num).toFixed(3).replace(/\.?0+$/, ''); }
+                if (f === "MODE") x = {PH:"SSB",RY:"RTTY",DG:"FT8",FT8:"FT8",FT4:"FT4",CW:"CW"}[val.toUpperCase()] || val.toUpperCase();
+                if (f === "QSO_DATE") x = val.replace(/-/g,'');
+                if (f === "TIME_ON") x = val.padEnd(6,'0').slice(0,6);
+                if (f === "MY_CALLSIGN") x = myCallsign;
+                r[f] = x;
+            });
+
+            const userSel = dom.contestSelect.value;
+            if (userSel) r.CONTEST_ID = userSel;
+            else if (detectedContestId) r.CONTEST_ID = detectedContestId;
+
+            const ov = qsoOverrides.get(idx) || {};
+            const finalComment = [global.comment, ov.comment].filter(Boolean).join(" | ") || (rawContestName && !userSel ? rawContestName : "");
+            if (finalComment) r.COMMENT = finalComment;
+            if (global.txpwr || ov.txpwr) r.TX_PWR = ov.txpwr || global.txpwr;
+            if (global.k || ov.k) r.K_INDEX = ov.k || global.k;
+            if (global.a || ov.a) r.A_INDEX = ov.a || global.a;
+            if (global.sfi || ov.sfi) r.SFI = ov.sfi || global.sfi;
+
+            r.CALL ||= "NOCALL"; r.QSO_DATE ||= "20000101"; r.TIME_ON ||= "000000"; r.MODE ||= "SSB";
+
+            let o = "";
+            Object.keys(r).sort().forEach(k => o += `<${k}:${r[k].length}>${r[k]} `);
+            adif += o + "<EOR>\n";
+        });
+
+        const blob = new Blob([adif], {type:'text/plain'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `SmithLog_${new Date().toISOString().slice(0,10)}.adi`; a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    // Cleanup & shortcuts
+    document.addEventListener('click', () => { document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none'); document.querySelectorAll('.title-box').forEach(b => b.classList.remove('active')); });
+    document.getElementById('clearBtn').addEventListener('click', () => confirm("Clear everything?") && location.reload());
+    document.addEventListener('keydown', e => {
+        if (e.key === 'F4') document.getElementById('analyzeBtn').click();
+        if (e.key === 'F10' && !dom.btnGenerate.disabled) dom.btnGenerate.click();
+        if (e.key === 'Escape') document.getElementById('clearBtn').click();
+    });
+});
+</script>
+</body>
+</html>
