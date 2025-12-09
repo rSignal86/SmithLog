@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SmithLog GHv1.0 – Universal Cabrillo to ADIF</title>
+<title>SmithLog – Universal Cabrillo to ADIF</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -13,86 +13,98 @@
         --card:#111;
         --warning:#ffaa00;
         --warning-bg:#332200;
+        --update:#ff6600;
     }
-    body {background:var(--bg); color:#fff; font-family:'Segoe UI',sans-serif; margin:0; padding:20px; text-align:center;}
-    h1 {font-family:'Inconsolata',monospace; color:var(--accent-strong); font-size:52px; text-shadow:0 0 20px #0f0;}
-    h2 {color:#aaa; margin:5px 0 50px; font-size:24px;}
+    body {background:var(--bg); color:#fff; font-family:'Segoe UI',sans-serif; margin:0; padding:15px; text-align:center;}
+    h1 {font-family:'Inconsolata',monospace; color:var(--accent-strong); font-size:46px; text-shadow:0 0 15px #0f0; margin:20px 0 10px;}
+    h2 {color:#aaa; margin:5px 0 30px; font-size:20px;}
     .container {max-width:1650px; margin:0 auto;}
 
     .toolbar {
-        display:flex; flex-wrap:wrap; gap:20px; justify-content:center; align-items:center;
-        margin:40px 0 20px 0; background:#001100; padding:20px; border-radius:16px; border:2px solid var(--accent);
+        display:flex; flex-wrap:wrap; gap:15px; justify-content:center; align-items:center;
+        margin:25px 0 15px 0; background:#001100; padding:14px; border-radius:12px; border:2px solid var(--accent);
     }
     .upload-wrapper {margin-right:auto;}
-    #uploadBtn {background:#ff8c00; font-size:20px; padding:16px 32px;}
-    button {padding:18px 40px; font-size:21px; border:none; border-radius:12px; cursor:pointer; color:#000; font-weight:bold;}
+    #uploadBtn {background:#ff8c00; font-size:19px; padding:12px 28px;}
+    button {padding:14px 32px; font-size:19px; border:none; border-radius:10px; cursor:pointer; color:#000; font-weight:bold;}
     #analyzeBtn   {background:#00ccff;}
-    #generateBtn  {background:#28a745; font-size:24px;}
+    #generateBtn  {background:#28a745; font-size:22px;}
     #clearBtn     {background:#dc3545;}
-    button:hover {transform:scale(1.08);}
+    #consoleBtn   {background:#9933ff; color:#fff;}
+    #helpBtn      {background:#00b7eb; color:#fff;}
+    button:hover {transform:scale(1.07);}
     button:disabled {opacity:0.5; cursor:not-allowed;}
 
-    textarea {width:100%; height:300px; padding:20px; background:#222; color:#fff; border:2px solid #444; border-radius:12px; font-family:'Inconsolata',monospace; font-size:18px; margin:20px 0;}
+    textarea {width:100%; height:260px; padding:16px; background:#222; color:#fff; border:2px solid #444; border-radius:10px; font-family:'Inconsolata',monospace; font-size:17px; margin:15px 0;}
 
-    .section {background:var(--card); padding:40px; border-radius:16px; margin:30px 0; border:2px solid #003300;}
-    .inputHeader {font-size:24px; color:var(--accent-strong); margin-bottom:20px; font-weight:bold;}
-
-    #mappingArea {display:none;}
-
-    .contest-status {
-        margin:20px 0; padding:15px; background:#001a00; border-radius:12px; 
-        color:var(--accent-strong); font-size:20px; font-weight:bold; text-align:center;
-    }
-
-    table {width:100%; border-collapse:separate; border-spacing:0; margin-top:20px; font-family:'Inconsolata',monospace; font-size:18px;}
-    th {background:#002200; padding:0; position:relative; border:3px solid var(--accent);}
-    td {padding:14px 10px; background:#0a0a0a; text-align:center; border:1px solid #333; color:#ddd;}
-    tr:hover td {background:#111;}
-    td[contenteditable="true"] {background:#001a00; cursor:text; color:#ff0;}
-    td[contenteditable="true"]:focus {outline:3px solid var(--accent-strong);}
-
-    .title-box {
-        display:block; padding:20px 12px; font-weight:bold; color:var(--accent-strong); cursor:pointer;
-        text-align:center; background:#001100; height:100%; box-sizing:border-box; font-size:18px;
-    }
-    .title-box:hover {background:#002200;}
-    .title-box.active {background:#003300; color:#fff;}
-    .title-box.unknown {background:var(--warning-bg); color:var(--warning);}
-
-    .dropdown {
-        display:none; position:absolute; top:100%; left:0; width:100%; max-height:450px; overflow-y:auto;
-        background:#001100; border:3px solid var(--accent); border-top:none; z-index:100;
-    }
-    .dropdown option {padding:16px 12px; color:#88ff88; cursor:pointer; font-size:17px;}
-    .dropdown option:hover {background:#003300; color:#fff;}
-
-    .autoTag {position:absolute; top:6px; right:8px; font-size:12px; color:#00ff00; background:#000; padding:4px 8px; border-radius:6px; font-weight:bold;}
+    .inputHeader {font-size:22px; color:var(--accent-strong); margin:35px 0 15px; font-weight:bold; text-align:center;}
 
     .global-fields {
         display:grid;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap:20px;
-        margin:30px 0;
+        gap:15px;
+        margin:30px auto;
         max-width: 1200px;
-        margin-left: auto;
-        margin-right: auto;
     }
     .global-field label {
-        display:block; margin-bottom:8px; color:var(--accent); font-weight:bold; font-size:17px;
+        display:block; margin-bottom:6px; color:var(--accent); font-weight:bold; font-size:16px;
     }
     .global-field input, .global-field select {
-        width:100%; padding:14px; background:#222; color:#fff; border:2px solid #666; border-radius:10px; font-size:17px;
+        width:100%; padding:12px; background:#222; color:#fff; border:2px solid #666; border-radius:8px; font-size:16px;
     }
 
-    footer {margin-top:80px; color:#888; font-size:18px;}
-    #norwayBadge {height:56px; animation: wave 7s ease-in-out infinite;}
+    table {width:100%; border-collapse:separate; border-spacing:0; margin-top:15px; font-family:'Inconsolata',monospace; font-size:16px;}
+    th {background:#002200; padding:0; position:relative; border:3px solid var(--accent); white-space:nowrap;}
+    td {padding:9px 7px; background:#0a0a0a; text-align:center; border:1px solid #333; color:#ddd; font-size:15px;}
+    tr:hover td {background:#111;}
+    td[contenteditable="true"] {background:#001a00; cursor:text; color:#ff0;}
+    td[contenteditable="true"]:focus {outline:3px solid var(--accent-strong);}
+
+    .title-box {display:block; padding:14px 10px; font-weight:bold; color:var(--accent-strong); cursor:pointer;
+        text-align:center; background:#001100; height:100%; box-sizing:border-box; font-size:16px;}
+    .title-box:hover {background:#002200;}
+    .title-box.active {background:#003300; color:#fff;}
+    .title-box.unknown {background:var(--warning-bg); color:var(--warning);}
+    .dropdown {display:none; position:absolute; top:100%; left:0; width:100%; max-height:400px; overflow-y:auto;
+        background:#001100; border:3px solid var(--accent); border-top:none; z-index:100;}
+    .dropdown option {padding:14px 10px; color:#88ff88; cursor:pointer; font-size:16px;}
+    .dropdown option:hover {background:#003300; color:#fff;}
+    .autoTag {position:absolute; top:4px; right:6px; font-size:11px; color:#00ff00; background:#000; padding:3px 6px; border-radius:5px; font-weight:bold;}
+
+    #consoleOutput {
+        background:#000; color:#0f0; font-family:'Inconsolata',monospace; font-size:14px; padding:12px; margin:20px 0;
+        border:2px solid #004400; border-radius:8px; height:140px; overflow-y:auto; text-align:left; display:none;
+    }
+
+    #helpModal {
+        display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95);
+        z-index:1000; justify-content:center; align-items:center; padding:20px; box-sizing:border-box;
+    }
+    #helpContent {
+        background:#001100; padding:30px; border-radius:15px; border:3px solid var(--accent); max-width:800px;
+        font-size:18px; line-height:1.6; color:#ddd;
+    }
+    #helpContent h3 {color:var(--accent-strong); margin-top:25px;}
+    #closeHelp {float:right; font-size:28px; cursor:pointer; color:#aaa;}
+    #closeHelp:hover {color:#fff;}
+
+    footer {margin-top:70px; color:#888; font-size:17px; position:relative;}
+    #norwayBadge {height:50px; animation: wave 7s ease-in-out infinite; cursor:help;}
+    #norwayBadge[title]:hover::after {
+        content: attr(title);
+        position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%);
+        background: #001100; color:#00ff80; padding:8px 14px; border-radius:8px;
+        border:2px solid var(--accent); white-space:nowrap; font-size:15px; z-index:1000;
+    }
+    #versionStatus {margin-top: 12px; font-family: 'Inconsolata', monospace; font-size: 16px; color:#00ff80;}
+    #versionCheckStatus {margin-left: 12px; font-weight: bold;}
     @keyframes wave {0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
 </style>
 </head>
 <body>
 <div class="container">
-    <h1>SmithLog GHv1.0</h1>
-    <h2>Universal Cabrillo to ADIF Converter</h2>
+    <h1>SmithLog – Universal Cabrillo to ADIF</h1>
+    <h2>Made With ♥ from a ham to a ham</h2>
 
     <div class="toolbar">
         <div class="upload-wrapper">
@@ -102,25 +114,25 @@
         <button id="analyzeBtn">Analyze Cabrillo [F4]</button>
         <button id="generateBtn" disabled>Generate ADIF [F10]</button>
         <button id="clearBtn">Clear All [Esc]</button>
+        <button id="consoleBtn">Console</button>
+        <button id="helpBtn">Help</button>
     </div>
 
-    <div id="contestStatus" class="contest-status">Loading contest database...</div>
+    <div id="consoleOutput"></div>
 
-    <div class="section">
-        <div class="inputHeader">Paste your Cabrillo log below</div>
-        <textarea id="cabrilloInput" placeholder="START-OF-LOG: 3.0..."></textarea>
-    </div>
+    <div class="inputHeader">Paste your Cabrillo log below</div>
+    <textarea id="cabrilloInput" placeholder="START-OF-LOG: 3.0..."></textarea>
 
-    <div id="mappingArea" class="section">
-        <h3 style="color:var(--accent-strong); margin-bottom:30px;">Global optional settings</h3>
-        <div class="global-fields">
+    <div id="globalSettingsArea" style="display:none;">
+        <div class="inputHeader">Global optional settings</div>
+        <div class="global-fields" id="globalFieldsContainer">
             <div class="global-field">
                 <label>Contest (auto-detected)</label>
                 <select id="contestSelect"><option value="">– Detecting... –</option></select>
             </div>
             <div class="global-field">
                 <label>Global Comment</label>
-                <input type="text" id="globalComment" placeholder="e.g. SAC 2025, Home station">
+                <input type="text" id="globalComment" placeholder="e.g. Home station, 100W, dipole">
             </div>
             <div class="global-field">
                 <label>TX Power (watts)</label>
@@ -139,8 +151,10 @@
                 <input type="text" id="globalSFI" placeholder="e.g. 145">
             </div>
         </div>
+    </div>
 
-        <h3 style="color:var(--accent-strong); margin:40px 0 20px;">QSO Preview & Mapping</h3>
+    <div id="mappingArea" style="display:none;">
+        <div class="inputHeader">QSO Preview & Column Mapping (all QSOs shown)</div>
         <table id="previewTable">
             <thead id="columnHeaders"></thead>
             <tbody id="previewRows"></tbody>
@@ -148,107 +162,184 @@
     </div>
 
     <footer>
-        <a href="https://github.com/rSignal86/SmithLog" target="_blank">SmithLog GHv1.0</a>
-        <img id="norwayBadge" src="https://raw.githubusercontent.com/rSignal86/SmithLog/main/productofnorway.png" alt="Product of Norway">
-        <span>Made in Norway – 73 de LB6QJ</span>
+        <a href="https://github.com/rSignal86/smithlog" target="_blank">SmithLog GHv1.0</a>
+        <img id="norwayBadge" src="https://raw.githubusercontent.com/rSignal86/smithlog/main/productofnorway.png" 
+             alt="Product of Norway" title="Made in Norway – 73 de LB6QJ and GROK">
+        <div id="versionStatus">
+            SmithLog GHv1.0 – 2025-12-09 
+            <span id="versionCheckStatus">Checking for updates...</span>
+        </div>
     </footer>
 </div>
 
+<!-- Help Modal -->
+<div id="helpModal">
+    <div id="helpContent">
+        <span id="closeHelp">X</span>
+        <h2 style="color:var(--accent-strong); margin-top:0;">SmithLog – How to Use</h2>
+        <p>This tool follows ADIF Standard Version 3.1.6</p>
+        <h3>1. Load your log</h3>
+        <p>Paste or upload your Cabrillo file.</p>
+        <h3>2. Click "Analyze Cabrillo" (F4)</h3>
+        <p>SmithLog auto-detects contest and columns.</p>
+        <h3>3. Contest detection</h3>
+        <p>If your contest is known → correct <code>CONTEST_ID</code> is set automatically.<br>
+        If not known → contest name is added to comment.</p>
+        <h3>4. Check column mapping</h3>
+        <p>Click any header to change field, the yellow is marked as UNKNOW that you click to assign a ADIF stanard to Column.</p>
+	<p>Use STX for serial exchange you send </p>
+	<p>Use SRX for serial exchange you recive </p>
+	<p>Use STX_string for contest exchange you send </p>
+	<p>Use SRX_string for contest exchange you recive </p>
+        <h3>5. Generate ADIF (F10)</h3>
+        <p>Download ready for upload to QRZ.com</p>
+        <p>Good luck – 73 de LB6QJ and GROK!</p>
+    </div>
+</div>
+
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-    // === ALL CODE INSIDE HERE – GUARANTEED DOM IS READY ===
-
-    const TOOLTIPS = {
-        "UNKNOWN": "This column is not mapped – click to assign ADIF field",
-        "CALL": "Other station's callsign",
-        "QSO_DATE": "QSO date (YYYY-MM-DD → becomes YYYYMMDD)",
-        "TIME_ON": "QSO start time (HHMM or HHMMSS)",
-        "FREQ": "Frequency in kHz → automatically converted to MHz",
-        "MODE": "Mode (SSB, CW, RTTY, FT8, etc.)",
-        "RST_SENT": "Your sent report (59 / 599)",
-        "RST_RCVD": "Received report",
-        "STX": "Your sent serial number",
-        "SRX": "Received serial number",
-        "STX_STRING": "Your sent exchange (text)",
-        "SRX_STRING": "Received exchange (text)",
-        "NAME": "Other station's name",
-        "GRID": "Maidenhead locator",
-        "STATE": "US state or province",
-        "MY_CALLSIGN": "Your callsign (from header)",
-        "TX_PWR": "Your transmit power in watts",
-        "CONTEST_ID": "Official ADIF contest name"
-    };
-
-    let rawQsoLines = [], columnMapping = [], myCallsign = "YOURCALL", sampleColumns = [], qsoOverrides = new Map();
-    let rawContestName = "", contestList = {}, detectedContestId = null;
-
+document.addEventListener("DOMContentLoaded", async () => {
     const dom = {
         input: document.getElementById('cabrilloInput'),
         mappingArea: document.getElementById('mappingArea'),
-        contestStatus: document.getElementById('contestStatus'),
+        globalSettingsArea: document.getElementById('globalSettingsArea'),
+        globalFieldsContainer: document.getElementById('globalFieldsContainer'),
         contestSelect: document.getElementById('contestSelect'),
+        globalComment: document.getElementById('globalComment'),
         headers: document.getElementById('columnHeaders'),
         preview: document.getElementById('previewRows'),
-        globalComment: document.getElementById('globalComment'),
         globalTxPower: document.getElementById('globalTxPower'),
         globalK: document.getElementById('globalKIndex'),
         globalA: document.getElementById('globalAIndex'),
         globalSFI: document.getElementById('globalSFI'),
-        btnGenerate: document.getElementById('generateBtn')
+        btnGenerate: document.getElementById('generateBtn'),
+        consoleOutput: document.getElementById('consoleOutput'),
+        helpModal: document.getElementById('helpModal'),
+        closeHelp: document.getElementById('closeHelp'),
+        versionCheckStatus: document.getElementById('versionCheckStatus')
     };
 
-    // === UPLOAD ===
+    let rawQsoLines = [], columnMapping = [], myCallsign = "YOURCALL", sampleColumns = [], qsoOverrides = new Map();
+    let rawContestName = "", detectedContestId = null;
+    let contestDatabase = {};
+
+    try {
+        const res = await fetch('https://raw.githubusercontent.com/rSignal86/smithlog/main/QRZContestID.json');
+        const data = await res.json();
+        contestDatabase = data.contests || {};
+        log(`Contest database loaded – ${Object.keys(contestDatabase).length} contests`);
+    } catch (e) {
+        log("Contest database offline – running in basic mode");
+    }
+
+    function log(msg) {
+        const line = document.createElement('div');
+        line.textContent = `[${new Date().toISOString().slice(11,19)}] ${msg}`;
+        dom.consoleOutput.appendChild(line);
+        if (dom.consoleOutput.style.display === 'block') dom.consoleOutput.scrollTop = dom.consoleOutput.scrollHeight;
+    }
+
+    document.getElementById('consoleBtn').onclick = () => {
+        const visible = dom.consoleOutput.style.display === 'block';
+        dom.consoleOutput.style.display = visible ? 'none' : 'block';
+        if (!visible) dom.consoleOutput.scrollTop = dom.consoleOutput.scrollHeight;
+    };
+    log("SmithLog ready!");
+
+    function populateContestDropdown(selected = "") {
+        dom.contestSelect.innerHTML = '<option value="">– Manual selection –</option>';
+        Object.keys(contestDatabase).sort().forEach(id => {
+            const opt = document.createElement('option');
+            opt.value = id;
+            opt.textContent = `${id} – ${contestDatabase[id]}`;
+            if (id === selected) opt.selected = true;
+            dom.contestSelect.appendChild(opt);
+        });
+    }
+    populateContestDropdown();
+
+    document.getElementById('helpBtn').onclick = () => dom.helpModal.style.display = 'flex';
+    dom.closeHelp.onclick = () => dom.helpModal.style.display = 'none';
+    dom.helpModal.onclick = (e) => { if (e.target === dom.helpModal) dom.helpModal.style.display = 'none'; };
+
     document.getElementById('uploadBtn').addEventListener('click', () => document.getElementById('fileInput').click());
     document.getElementById('fileInput').addEventListener('change', e => {
         const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = ev => dom.input.value = ev.target.result;
-            reader.readAsText(file);
-        }
+        if (!file) return;
+        log(`Loading: ${file.name}`);
+        const reader = new FileReader();
+        reader.onload = ev => { dom.input.value = ev.target.result; log("File loaded"); };
+        reader.readAsText(file);
     });
 
-    // === LOAD CONTEST LIST ===
-    async function loadContestList() {
-        try {
-            const res = await fetch('https://raw.githubusercontent.com/rSignal86/SmithLog/main/QRZContestID.json');
-            const data = await res.json();
-            contestList = data.contests;
-            dom.contestStatus.textContent = `Contest database loaded – ${Object.keys(contestList).length} contests`;
-        } catch {
-            dom.contestStatus.textContent = "Contest database offline – basic mode";
-        }
-    }
-    loadContestList();
-
-    // === ANALYZE – NÅ VIRKER DEN GARANTERT! ===
     document.getElementById('analyzeBtn').addEventListener('click', () => {
         const text = dom.input.value.trim();
-        if (!text) return alert("Please paste or upload a Cabrillo log first!");
+        if (!text) return alert("Paste or upload a Cabrillo log first!");
 
         const lines = text.split('\n');
         rawQsoLines = lines.filter(l => l.trim().startsWith('QSO:'));
-        if (rawQsoLines.length === 0) return alert("No QSO lines found!");
+        if (rawQsoLines.length === 0) {
+            log("ERROR: No QSO lines found");
+            return alert("No QSO lines found!");
+        }
+        log(`Found ${rawQsoLines.length} QSOs – showing ALL`);
 
         lines.forEach(l => {
             if (l.trim().startsWith('CALLSIGN:')) myCallsign = l.split(':')[1].trim();
             if (l.trim().startsWith('CONTEST:')) rawContestName = l.split(':')[1].trim();
         });
 
+        detectedContestId = null;
+        if (rawContestName && Object.keys(contestDatabase).length > 0) {
+            const norm = rawContestName.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+            detectedContestId = Object.keys(contestDatabase).find(id => {
+                const name = contestDatabase[id];
+                return id.toUpperCase() === norm || (name && name.toUpperCase().includes(norm));
+            });
+        }
+
+        if (detectedContestId) {
+            dom.contestSelect.value = detectedContestId;
+            log(`Contest auto-detected: ${detectedContestId}`);
+        } else if (rawContestName) {
+            if (!dom.globalComment.value) dom.globalComment.value = rawContestName;
+            log(`Contest not found: "${rawContestName}" → added to comment`);
+        }
+
         sampleColumns = rawQsoLines[0].trim().split(/\s+/).slice(1);
         columnMapping = new Array(sampleColumns.length).fill("UNKNOWN");
         qsoOverrides = new Map();
 
         buildColumnHeaders();
-        renderPreviewTable();
-        detectAndSetContest();
+        renderAllQSOs();
 
+        dom.globalSettingsArea.style.display = 'block';
+        dom.globalFieldsContainer.style.display = 'grid';
         dom.mappingArea.style.display = 'block';
         dom.btnGenerate.disabled = false;
+
+        log(`Analysis complete – ${rawQsoLines.length} QSOs displayed`);
     });
 
-    // === RESTEN AV KODEN (buildColumnHeaders, renderPreviewTable, detectAndSetContest, generate ADIF osv.) ===
-    // – er identisk med forrige versjon og fungerer 100 %
+    const TOOLTIPS = {
+        "UNKNOWN": "Not mapped – click to assign",
+        "CALL": "Other station's callsign",
+        "QSO_DATE": "Date (YYYY-MM-DD → YYYYMMDD)",
+        "TIME_ON": "Start time (HHMM or HHMMSS)",
+        "FREQ": "Frequency in kHz → converted to MHz",
+        "MODE": "Mode (SSB, CW, RTTY, FT8 etc.)",
+        "RST_SENT": "Your sent report",
+        "RST_RCVD": "Received report",
+        "STX": "Your sent serial number",
+        "SRX": "Received serial number",
+        "STX_STRING": "Your sent exchange (text)",
+        "SRX_STRING": "Received exchange (text)",
+        "NAME": "Operator name",
+        "GRID": "Maidenhead locator",
+        "STATE": "US state / province",
+        "MY_CALLSIGN": "Your callsign",
+        "TX_PWR": "Your TX power"
+    };
 
     function buildColumnHeaders() {
         dom.headers.innerHTML = '';
@@ -256,43 +347,67 @@ document.addEventListener("DOMContentLoaded", () => {
         sampleColumns.forEach((_, i) => {
             const th = document.createElement('th');
             const box = document.createElement('div'); box.className = 'title-box';
-            let s = "UNKNOWN"; if (i===0) s="FREQ"; if (i===1) s="MODE"; if (i===2) s="QSO_DATE"; if (i===3) s="TIME_ON"; if (i===4) s="MY_CALLSIGN";
-            columnMapping[i] = s; box.textContent = s;
-            if (s === "UNKNOWN") box.classList.add('unknown');
+            let guessed = i===0 ? "FREQ" : i===1 ? "MODE" : i===2 ? "QSO_DATE" : i===3 ? "TIME_ON" : i===4 ? "MY_CALLSIGN" : "UNKNOWN";
+            columnMapping[i] = guessed; box.textContent = guessed;
+            if (guessed === "UNKNOWN") box.classList.add('unknown');
 
-            const sel = document.createElement('select'); sel.className = 'dropdown'; sel.size = 12;
-            Object.keys(TOOLTIPS).forEach(f => {
-                const o = document.createElement('option');
-                o.value = f; o.textContent = f; o.title = TOOLTIPS[f];
-                if (f === s) o.selected = true;
-                sel.appendChild(o);
+            const dropdown = document.createElement('select'); dropdown.className = 'dropdown'; dropdown.size = 12;
+            Object.keys(TOOLTIPS).forEach(field => {
+                const opt = document.createElement('option');
+                opt.value = field; opt.textContent = field; opt.title = TOOLTIPS[field];
+                if (field === guessed) opt.selected = true;
+                dropdown.appendChild(opt);
             });
 
-            sel.onchange = () => { columnMapping[i] = sel.value; box.textContent = sel.value; box.classList.toggle('unknown', sel.value === "UNKNOWN"); sel.style.display = 'none'; box.classList.remove('active'); };
-            box.onclick = e => { e.stopPropagation(); document.querySelectorAll('.dropdown').forEach(d=>d.style.display='none'); document.querySelectorAll('.title-box').forEach(b=>b.classList.remove('active')); box.classList.add('active'); sel.style.display = 'block'; sel.focus(); };
-            if (s !== "UNKNOWN") { const a = document.createElement('span'); a.className='autoTag'; a.textContent='AUTO'; th.appendChild(a); }
+            dropdown.onchange = () => {
+                columnMapping[i] = dropdown.value;
+                box.textContent = dropdown.value;
+                box.classList.toggle('unknown', dropdown.value === "UNKNOWN");
+                dropdown.style.display = 'none';
+                box.classList.remove('active');
+            };
 
-            th.appendChild(box); th.appendChild(sel); tr.appendChild(th);
+            box.onclick = e => {
+                e.stopPropagation();
+                document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+                document.querySelectorAll('.title-box').forEach(b => b.classList.remove('active'));
+                box.classList.add('active');
+                dropdown.style.display = 'block';
+                dropdown.focus();
+            };
+
+            if (guessed !== "UNKNOWN") {
+                const auto = document.createElement('span'); auto.className = 'autoTag'; auto.textContent = 'AUTO';
+                th.appendChild(auto);
+            }
+
+            th.appendChild(box); th.appendChild(dropdown); tr.appendChild(th);
         });
-        ["Comment","K-Index","A-Index","SFI"].forEach(l => { const th = document.createElement('th'); th.textContent = l; th.style.background = "#003300"; tr.appendChild(th); });
+
+        ["Comment","K-Index","A-Index","SFI"].forEach(title => {
+            const th = document.createElement('th'); th.textContent = title; th.style.background = "#003300";
+            tr.appendChild(th);
+        });
         dom.headers.appendChild(tr);
     }
 
-    function renderPreviewTable() {
+    function renderAllQSOs() {
         dom.preview.innerHTML = '';
-        rawQsoLines.slice(0, 25).forEach((line, idx) => {
+        rawQsoLines.forEach((line, idx) => {
             const fields = line.trim().split(/\s+/).slice(1);
             const row = document.createElement('tr');
-            fields.forEach(f => { const td = document.createElement('td'); td.textContent = f; row.appendChild(td); });
-            ["Comment","K-Index","A-Index","SFI"].forEach(k => {
+            fields.forEach(f => {
+                const td = document.createElement('td'); td.textContent = f; row.appendChild(td);
+            });
+            ["Comment","K-Index","A-Index","SFI"].forEach(key => {
                 const td = document.createElement('td'); td.contentEditable = true;
                 const ov = qsoOverrides.get(idx) || {};
-                td.textContent = ov[k.toLowerCase()] || "";
+                td.textContent = ov[key.toLowerCase()] || "";
                 td.onblur = () => {
                     const val = td.textContent.trim();
                     if (!qsoOverrides.has(idx)) qsoOverrides.set(idx, {});
-                    if (val) qsoOverrides.get(idx)[k.toLowerCase()] = val;
-                    else delete qsoOverrides.get(idx)[k.toLowerCase()];
+                    if (val) qsoOverrides.get(idx)[key.toLowerCase()] = val;
+                    else delete qsoOverrides.get(idx)[key.toLowerCase()];
                 };
                 row.appendChild(td);
             });
@@ -300,96 +415,117 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function detectAndSetContest() {
-        if (!rawContestName) { dom.contestStatus.textContent = "No CONTEST: tag found in header"; populateContestDropdown(""); return; }
-        const norm = rawContestName.toUpperCase().replace(/[^A-Z0-9-]/g, '');
-        let match = Object.keys(contestList).find(id => id.toUpperCase() === norm || contestList[id].toUpperCase().includes(norm));
-        if (match) {
-            detectedContestId = match; dom.contestSelect.value = match;
-            dom.contestStatus.innerHTML = `Contest auto-detected: <strong style="color:#00ff00;">${match}</strong>`;
-        } else {
-            detectedContestId = null;
-            dom.contestStatus.innerHTML = `Contest not found: "${rawContestName}" → added as comment`;
-            dom.globalComment.value = rawContestName;
-        }
-        populateContestDropdown(match || "");
-    }
-
-    function populateContestDropdown(selected) {
-        dom.contestSelect.innerHTML = '<option value="">– Manual selection –</option>';
-        Object.keys(contestList).sort().forEach(id => {
-            const opt = document.createElement('option');
-            opt.value = id; opt.textContent = `${id} – ${contestList[id]}`;
-            if (id === selected) opt.selected = true;
-            dom.contestSelect.appendChild(opt);
-        });
-    }
-    dom.contestSelect.onchange = () => detectedContestId = dom.contestSelect.value || null;
-
-    // Generate ADIF – inkl. TX Power
     dom.btnGenerate.addEventListener('click', () => {
-        const global = {
-            comment: dom.globalComment.value.trim(),
-            txpwr: dom.globalTxPower.value.trim(),
-            k: dom.globalK.value.trim(),
-            a: dom.globalA.value.trim(),
-            sfi: dom.globalSFI.value.trim()
-        };
+        log(`Generating ADIF with ${rawQsoLines.length} QSOs...`);
+        const selectedContestId = dom.contestSelect.value || detectedContestId;
 
-        let adif = `SmithLog GHv1.0 Export – Made in Norway\n<ADIF_VER:5>3.1.6\n<CREATED_TIMESTAMP:${new Date().toISOString().replace(/[-:T.]/g,'').slice(0,14)}>\n<PROGRAMID:8>SmithLog\n<PROGRAMVERSION:10>GHv1.0\n<EOH>\n\n`;
+        let adif = `SmithLog GHv1.0 Export – Made in Norway\n<ADIF_VER:5>3.1.4\n<CREATED_TIMESTAMP:${new Date().toISOString().replace(/[-:T.]/g,'').slice(0,14)}>\n<PROGRAMID:8>SmithLog\n<PROGRAMVERSION:10>GHv1.0\n<EOH>\n\n`;
 
+        let exported = 0;
         rawQsoLines.forEach((line, idx) => {
-            const p = line.trim().split(/\s+/);
-            if (p[0] !== 'QSO:') return;
-            const v = p.slice(1);
-            const r = {};
+            const parts = line.trim().split(/\s+/);
+            if (parts[0] !== 'QSO:') return;
+            const values = parts.slice(1);
+            const record = {};
 
-            v.forEach((val, i) => {
-                const f = columnMapping[i];
-                if (!f || f === "UNKNOWN") return;
-                let x = val;
-                if (f === "FREQ") { const num = parseFloat(val); if (!isNaN(num)) x = (num >= 1000 ? (num/1000) : num).toFixed(3).replace(/\.?0+$/, ''); }
-                if (f === "MODE") x = {PH:"SSB",RY:"RTTY",DG:"FT8",FT8:"FT8",FT4:"FT4",CW:"CW"}[val.toUpperCase()] || val.toUpperCase();
-                if (f === "QSO_DATE") x = val.replace(/-/g,'');
-                if (f === "TIME_ON") x = val.padEnd(6,'0').slice(0,6);
-                if (f === "MY_CALLSIGN") x = myCallsign;
-                r[f] = x;
+            values.forEach((val, i) => {
+                const field = columnMapping[i];
+                if (!field || field === "UNKNOWN") return;
+                let cleaned = val;
+                if (field === "FREQ") { const n = parseFloat(val); if (!isNaN(n)) cleaned = (n >= 1000 ? (n/1000) : n).toFixed(3).replace(/\.?0+$/, ''); }
+                if (field === "MODE") { const m = {PH:"SSB",RY:"RTTY",DG:"FT8",FT8:"FT8",FT4:"FT4",CW:"CW"}[val.toUpperCase()]; cleaned = m || val.toUpperCase(); }
+                if (field === "QSO_DATE") cleaned = val.replace(/-/g, '');
+                if (field === "TIME_ON") cleaned = val.padEnd(6,'0').slice(0,6);
+                if (field === "MY_CALLSIGN") cleaned = myCallsign;
+                record[field] = cleaned;
             });
 
-            const userSel = dom.contestSelect.value;
-            if (userSel) r.CONTEST_ID = userSel;
-            else if (detectedContestId) r.CONTEST_ID = detectedContestId;
+            if (selectedContestId) record.CONTEST_ID = selectedContestId;
 
             const ov = qsoOverrides.get(idx) || {};
-            const finalComment = [global.comment, ov.comment].filter(Boolean).join(" | ") || (rawContestName && !userSel ? rawContestName : "");
-            if (finalComment) r.COMMENT = finalComment;
-            if (global.txpwr || ov.txpwr) r.TX_PWR = ov.txpwr || global.txpwr;
-            if (global.k || ov.k) r.K_INDEX = ov.k || global.k;
-            if (global.a || ov.a) r.A_INDEX = ov.a || global.a;
-            if (global.sfi || ov.sfi) r.SFI = ov.sfi || global.sfi;
+            const comment = [dom.globalComment.value.trim(), ov.comment].filter(Boolean).join(" | ");
+            if (comment) record.COMMENT = comment;
+            if (dom.globalTxPower.value.trim() || ov.txpwr) record.TX_PWR = ov.txpwr || dom.globalTxPower.value.trim();
+            if (dom.globalK.value.trim() || ov.k) record.K_INDEX = ov.k || dom.globalK.value.trim();
+            if (dom.globalA.value.trim() || ov.a) record.A_INDEX = ov.a || dom.globalA.value.trim();
+            if (dom.globalSFI.value.trim() || ov.sfi) record.SFI = ov.sfi || dom.globalSFI.value.trim();
 
-            r.CALL ||= "NOCALL"; r.QSO_DATE ||= "20000101"; r.TIME_ON ||= "000000"; r.MODE ||= "SSB";
+            record.CALL ||= "NOCALL"; record.QSO_DATE ||= "20000101"; record.TIME_ON ||= "000000"; record.MODE ||= "SSB";
 
-            let o = "";
-            Object.keys(r).sort().forEach(k => o += `<${k}:${r[k].length}>${r[k]} `);
-            adif += o + "<EOR>\n";
+            let lineOut = "";
+            Object.keys(record).sort().forEach(k => lineOut += `<${k}:${record[k].length}>${record[k]} `);
+            adif += lineOut + "<EOR>\n";
+            exported++;
         });
 
-        const blob = new Blob([adif], {type:'text/plain'});
+        const blob = new Blob([adif], {type: 'text/plain'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url; a.download = `SmithLog_${new Date().toISOString().slice(0,10)}.adi`; a.click();
         URL.revokeObjectURL(url);
+
+        log(`ADIF generated – ${exported} QSOs exported${selectedContestId ? ` (CONTEST_ID: ${selectedContestId})` : ""}`);
     });
 
-    // Cleanup & shortcuts
-    document.addEventListener('click', () => { document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none'); document.querySelectorAll('.title-box').forEach(b => b.classList.remove('active')); });
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+        document.querySelectorAll('.title-box').forEach(b => b.classList.remove('active'));
+    });
+
     document.getElementById('clearBtn').addEventListener('click', () => confirm("Clear everything?") && location.reload());
+
     document.addEventListener('keydown', e => {
-        if (e.key === 'F4') document.getElementById('analyzeBtn').click();
-        if (e.key === 'F10' && !dom.btnGenerate.disabled) dom.btnGenerate.click();
+        if (e.key === 'F4') { e.preventDefault(); document.getElementById('analyzeBtn').click(); }
+        if (e.key === 'F10' && !dom.btnGenerate.disabled) { e.preventDefault(); dom.btnGenerate.click(); }
         if (e.key === 'Escape') document.getElementById('clearBtn').click();
     });
+
+    // ======== OPPDATERT VERSJONSJEKKER MED BEDRE REGEX OG LOGGING ========
+    async function checkForUpdate() {
+        const CURRENT_VERSION = "GHv1.0";
+        const statusElement = dom.versionCheckStatus;
+        const repoUrl = "https://github.com/rSignal86/smithlog";
+        const checkUrl = `https://raw.githubusercontent.com/rSignal86/smithlog/main/SmithLog.html?t=${Date.now()}`; // Cache-busting
+
+        log(`[VERSION CHECK] Starting check against ${checkUrl}`);
+        
+        try {
+            const response = await fetch(checkUrl, { cache: "no-store" });
+            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+            
+            const text = await response.text();
+            log(`[VERSION CHECK] Fetched ${text.length} bytes successfully`);
+
+            // Forbedret regex: Matcher "SmithLog GHvX.X" uansett strong eller ikke
+            const versionMatch = text.match(/SmithLog\s+(GHv\d+\.\d+)/i);
+            if (!versionMatch) {
+                log(`[VERSION CHECK] No version match found in HTML. Snippet: ${text.substring(text.indexOf('<footer>'), text.indexOf('</footer>') + 9)}`);
+                throw new Error("Version pattern not found");
+            }
+
+            const latestVersion = versionMatch[1];
+            log(`[VERSION CHECK] Parsed latest: ${latestVersion} (local: ${CURRENT_VERSION})`);
+
+            if (latestVersion === CURRENT_VERSION) {
+                statusElement.innerHTML = '– You are on the latest version';
+                statusElement.style.color = '#00ff80';
+                log(`[VERSION CHECK] ✅ Up to date`);
+            } else {
+                statusElement.innerHTML = `– NEW VERSION! <a href="${repoUrl}" target="_blank" style="color:#ff6600; font-weight:bold; text-decoration:underline;">${latestVersion} → Update now!</a>`;
+                statusElement.style.color = '#ff6600';
+                log(`[VERSION CHECK] 🚨 Update available: ${latestVersion}`);
+            }
+        } catch (err) {
+            statusElement.innerHTML = `– Check failed (offline?)`;
+            statusElement.style.color = '#888';
+            log(`[VERSION CHECK] ❌ Error: ${err.message}`);
+        }
+    }
+
+    // Kjør sjekken
+    checkForUpdate();
+    setInterval(checkForUpdate, 5 * 60 * 1000);
+    // ============================================
 });
 </script>
 </body>
