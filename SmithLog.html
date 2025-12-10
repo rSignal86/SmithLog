@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SmithLog – Universal Cabrillo to ADIF</title>
+<title>SmithLog – Universal Cabrillo to ADIF (modified)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -16,88 +16,75 @@
         --update:#ff6600;
     }
     body {background:var(--bg); color:#fff; font-family:'Segoe UI',sans-serif; margin:0; padding:15px; text-align:center;}
-    h1 {font-family:'Inconsolata',monospace; color:var(--accent-strong); font-size:46px; text-shadow:0 0 15px #0f0; margin:20px 0 10px;}
-    h2 {color:#aaa; margin:5px 0 30px; font-size:20px;}
-    .container {max-width:1650px; margin:0 auto;}
+    h1 {font-family:'Inconsolata',monospace; color:var(--accent-strong); font-size:40px; text-shadow:0 0 10px #0f0; margin:18px 0 8px;}
+    h2 {color:#aaa; margin:5px 0 20px; font-size:18px;}
 
+    /* EDIT HERE TO CHANGED THE WITH OF THE PROGRAM */
+    .container {max-width:1500px; margin:0 auto;}
+
+    /* toolbar: narrower and centered; buttons reduced padding to make them less wide */
     .toolbar {
-        display:flex; flex-wrap:wrap; gap:15px; justify-content:center; align-items:center;
-        margin:25px 0 15px 0; background:#001100; padding:14px; border-radius:12px; border:2px solid var(--accent);
+        display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center;
+        margin:18px 0 12px 0; background:#001100; padding:8px; border-radius:10px; border:2px solid var(--accent);
+        max-width:100%; width:100%; box-sizing:border-box;
     }
     .upload-wrapper {margin-right:auto;}
-    #uploadBtn {background:#ff8c00; font-size:19px; padding:12px 28px;}
-    button {padding:14px 32px; font-size:19px; border:none; border-radius:10px; cursor:pointer; color:#000; font-weight:bold;}
+    #uploadBtn {background:#ff8c00; font-size:15px; padding:8px 14px;}
+    button {padding:8px 14px; font-size:15px; border:none; border-radius:8px; cursor:pointer; color:#000; font-weight:bold;}
     #analyzeBtn   {background:#00ccff;}
-    #generateBtn  {background:#28a745; font-size:22px;}
+    #generateBtn  {background:#28a745;}
     #clearBtn     {background:#dc3545;}
     #consoleBtn   {background:#9933ff; color:#fff;}
     #helpBtn      {background:#00b7eb; color:#fff;}
-    button:hover {transform:scale(1.07);}
-    button:disabled {opacity:0.5; cursor:not-allowed;}
+    button:hover {transform:scale(1.03);}
+    button:disabled {opacity:0.6; cursor:not-allowed;}
 
-    textarea {width:100%; height:260px; padding:16px; background:#222; color:#fff; border:2px solid #444; border-radius:10px; font-family:'Inconsolata',monospace; font-size:17px; margin:15px 0;}
+    /* Make the textarea the same visible width as the toolbar by constraining with same max-width */
+    .inputWrapper {max-width:100%; margin:0 auto;}
+    textarea {width:100%; height:260px; padding:12px; background:#222; color:#fff; border:2px solid #444; border-radius:10px; font-family:'Inconsolata',monospace; font-size:16px; margin:12px 0; box-sizing:border-box;}
 
-    .inputHeader {font-size:22px; color:var(--accent-strong); margin:35px 0 15px; font-weight:bold; text-align:center;}
+    .inputHeader {font-size:20px; color:var(--accent-strong); margin:28px 0 12px; font-weight:bold; text-align:center;}
 
     .global-fields {
         display:grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap:15px;
-        margin:30px auto;
-        max-width: 1200px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap:12px;
+        margin:20px auto;
+        max-width: 900px;
     }
-    .global-field label {
-        display:block; margin-bottom:6px; color:var(--accent); font-weight:bold; font-size:16px;
-    }
-    .global-field input, .global-field select {
-        width:100%; padding:12px; background:#222; color:#fff; border:2px solid #666; border-radius:8px; font-size:16px;
-    }
+    .global-field label {display:block; margin-bottom:6px; color:var(--accent); font-weight:bold; font-size:14px;}
+    .global-field input, .global-field select {width:80%; padding:10px; background:#222; color:#fff; border:2px solid #666; border-radius:8px; font-size:14px;}
 
-    table {width:100%; border-collapse:separate; border-spacing:0; margin-top:15px; font-family:'Inconsolata',monospace; font-size:16px;}
-    th {background:#002200; padding:0; position:relative; border:3px solid var(--accent); white-space:nowrap;}
-    td {padding:9px 7px; background:#0a0a0a; text-align:center; border:1px solid #333; color:#ddd; font-size:15px;}
+    table {width:100%; max-width:100%; border-collapse:separate; border-spacing:0; margin-top:12px; font-family:'Inconsolata',monospace; font-size:14px;}
+    th {background:#002200; padding:0; position:relative; border:2px solid var(--accent); white-space:nowrap;}
+    td {padding:7px 6px; background:#0a0a0a; text-align:center; border:1px solid #333; color:#ddd; font-size:13px;}
     tr:hover td {background:#111;}
     td[contenteditable="true"] {background:#001a00; cursor:text; color:#ff0;}
-    td[contenteditable="true"]:focus {outline:3px solid var(--accent-strong);}
+    td[contenteditable="true"]:focus {outline:2px solid var(--accent-strong);}
 
-    .title-box {display:block; padding:14px 10px; font-weight:bold; color:var(--accent-strong); cursor:pointer;
-        text-align:center; background:#001100; height:100%; box-sizing:border-box; font-size:16px;}
+    .title-box {display:block; padding:8px 8px; font-weight:bold; color:var(--accent-strong); cursor:pointer; text-align:center; background:#001100; height:100%; box-sizing:border-box; font-size:13px;}
     .title-box:hover {background:#002200;}
     .title-box.active {background:#003300; color:#fff;}
     .title-box.unknown {background:var(--warning-bg); color:var(--warning);}
-    .dropdown {display:none; position:absolute; top:100%; left:0; width:100%; max-height:400px; overflow-y:auto;
-        background:#001100; border:3px solid var(--accent); border-top:none; z-index:100;}
-    .dropdown option {padding:14px 10px; color:#88ff88; cursor:pointer; font-size:16px;}
+    .dropdown {display:none; position:absolute; top:100%; left:0; width:100%; max-height:240px; overflow-y:auto; background:#001100; border:2px solid var(--accent); border-top:none; z-index:100;}
+    .dropdown option {padding:10px; color:#88ff88; cursor:pointer; font-size:14px;}
     .dropdown option:hover {background:#003300; color:#fff;}
     .autoTag {position:absolute; top:4px; right:6px; font-size:11px; color:#00ff00; background:#000; padding:3px 6px; border-radius:5px; font-weight:bold;}
 
-    #consoleOutput {
-        background:#000; color:#0f0; font-family:'Inconsolata',monospace; font-size:14px; padding:12px; margin:20px 0;
-        border:2px solid #004400; border-radius:8px; height:140px; overflow-y:auto; text-align:left; display:none;
-    }
+    #consoleOutput {background:#000; color:#0f0; font-family:'Inconsolata',monospace; font-size:13px; padding:10px; margin:14px 0; border:2px solid #004400; border-radius:8px; height:120px; overflow-y:auto; text-align:left; display:none;}
 
-    #helpModal {
-        display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95);
-        z-index:1000; justify-content:center; align-items:center; padding:20px; box-sizing:border-box;
-    }
-    #helpContent {
-        background:#001100; padding:30px; border-radius:15px; border:3px solid var(--accent); max-width:800px;
-        font-size:18px; line-height:1.6; color:#ddd;
-    }
-    #helpContent h3 {color:var(--accent-strong); margin-top:25px;}
-    #closeHelp {float:right; font-size:28px; cursor:pointer; color:#aaa;}
+    /* Help modal — smaller and scrollable when content grows */
+    #helpModal {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:1000; justify-content:center; align-items:center; padding:20px; box-sizing:border-box;}
+    #helpContent {background:#001100; padding:20px; border-radius:12px; border:2px solid var(--accent); max-width:700px; width:100%; font-size:16px; line-height:1.5; color:#ddd; max-height:72vh; overflow-y:auto;}
+    #helpContent h3 {color:var(--accent-strong); margin-top:18px;}
+    #closeHelp {float:right; font-size:24px; cursor:pointer; color:#aaa;}
     #closeHelp:hover {color:#fff;}
 
-    footer {margin-top:70px; color:#888; font-size:17px; position:relative;}
-    #norwayBadge {height:50px; animation: wave 7s ease-in-out infinite; cursor:help;}
-    #norwayBadge[title]:hover::after {
-        content: attr(title);
-        position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%);
-        background: #001100; color:#00ff80; padding:8px 14px; border-radius:8px;
-        border:2px solid var(--accent); white-space:nowrap; font-size:15px; z-index:1000;
-    }
-    #versionStatus {margin-top: 12px; font-family: 'Inconsolata', monospace; font-size: 16px; color:#00ff80;}
-    #versionCheckStatus {margin-left: 12px; font-weight: bold;}
+    footer {margin-top:40px; color:#888; font-size:14px; position:relative;}
+    #norwayBadge {height:40px; animation: wave 7s ease-in-out infinite; cursor:help;}
+    #norwayBadge[title]:hover::after {content: attr(title); position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%); background: #001100; color:#00ff80; padding:8px 12px; border-radius:8px; border:2px solid var(--accent); white-space:nowrap; font-size:13px; z-index:1000;}
+    #versionStatus {margin-top: 8px; font-family: 'Inconsolata', monospace; font-size: 13px; color:#00ff80;}
+    #versionCheckStatus {margin-left: 8px; font-weight: bold;}
     @keyframes wave {0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
 </style>
 </head>
@@ -106,9 +93,9 @@
     <h1>SmithLog – Universal Cabrillo to ADIF</h1>
     <h2>Made With ♥ from a ham to a ham</h2>
 
-    <div class="toolbar">
+    <div class="toolbar" role="toolbar" aria-label="Main toolbar">
         <div class="upload-wrapper">
-            <button id="uploadBtn">Upload .log / .txt file</button>
+            <button id="uploadBtn">Upload .log / .txt</button>
             <input type="file" id="fileInput" accept=".log,.txt" style="display:none">
         </div>
         <button id="analyzeBtn">Analyze Cabrillo [F4]</button>
@@ -118,10 +105,12 @@
         <button id="helpBtn">Help</button>
     </div>
 
-    <div id="consoleOutput"></div>
+    <div id="consoleOutput" aria-live="polite"></div>
 
-    <div class="inputHeader">Paste your Cabrillo log below</div>
-    <textarea id="cabrilloInput" placeholder="START-OF-LOG: 3.0..."></textarea>
+    <div class="inputWrapper">
+        <div class="inputHeader">Paste your Cabrillo log below</div>
+        <textarea id="cabrilloInput" placeholder="START-OF-LOG: 3.0..."></textarea>
+    </div>
 
     <div id="globalSettingsArea" style="display:none;">
         <div class="inputHeader">Global optional settings</div>
@@ -162,18 +151,23 @@
     </div>
 
     <footer>
-        <a href="https://github.com/rSignal86/smithlog" target="_blank">SmithLog GHv1.0</a>
-        <img id="norwayBadge" src="https://raw.githubusercontent.com/rSignal86/smithlog/main/productofnorway.png" 
-             alt="Product of Norway" title="Made in Norway – 73 de LB6QJ and GROK">
-        <div id="versionStatus">
-            SmithLog GHv1.0 – 2025-12-09 
-            <span id="versionCheckStatus">Checking for updates...</span>
+        <div style="display:flex; align-items:center; justify-content:center; gap:22px; flex-wrap:wrap; padding:18px 0; font-size:18px;">
+            <img id="norwayBadge" src="https://raw.githubusercontent.com/rSignal86/smithlog/main/productofnorway.png"
+                 alt="Product of Norway" title="Made in Norway – 73 de LB6QJ and GROK" style="height:58px;">
+
+            <a href="https://github.com/rSignal86/smithlog" target="_blank" style="color:#00ff80; font-weight:bold; text-decoration:none; font-size:20px;">
+                SmithLog – GitHub Repository
+            </a>
+
+            <div id="versionStatus" style="font-family:'Inconsolata', monospace; font-size:18px; color:#00ff80;">
+                <span id="versionCheckStatus">Checking for updates...</span>
+            </div>
         </div>
     </footer>
 </div>
 
 <!-- Help Modal -->
-<div id="helpModal">
+<div id="helpModal" role="dialog" aria-modal="true" aria-hidden="true">
     <div id="helpContent">
         <span id="closeHelp">X</span>
         <h2 style="color:var(--accent-strong); margin-top:0;">SmithLog – How to Use</h2>
@@ -186,11 +180,11 @@
         <p>If your contest is known → correct <code>CONTEST_ID</code> is set automatically.<br>
         If not known → contest name is added to comment.</p>
         <h3>4. Check column mapping</h3>
-        <p>Click any header to change field, the yellow is marked as UNKNOW that you click to assign a ADIF stanard to Column.</p>
-	<p>Use STX for serial exchange you send </p>
-	<p>Use SRX for serial exchange you recive </p>
-	<p>Use STX_string for contest exchange you send </p>
-	<p>Use SRX_string for contest exchange you recive </p>
+        <p>Click any header to change field, the yellow is marked as UNKNOWN that you click to assign an ADIF standard to Column.</p>
+        <p>Use STX for serial exchange you send </p>
+        <p>Use SRX for serial exchange you receive </p>
+        <p>Use STX_STRING for contest exchange you send (text) </p>
+        <p>Use SRX_STRING for contest exchange you receive (text) </p>
         <h3>5. Generate ADIF (F10)</h3>
         <p>Download ready for upload to QRZ.com</p>
         <p>Good luck – 73 de LB6QJ and GROK!</p>
@@ -198,40 +192,52 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", async () => {
-    const dom = {
-        input: document.getElementById('cabrilloInput'),
-        mappingArea: document.getElementById('mappingArea'),
-        globalSettingsArea: document.getElementById('globalSettingsArea'),
-        globalFieldsContainer: document.getElementById('globalFieldsContainer'),
-        contestSelect: document.getElementById('contestSelect'),
-        globalComment: document.getElementById('globalComment'),
-        headers: document.getElementById('columnHeaders'),
-        preview: document.getElementById('previewRows'),
-        globalTxPower: document.getElementById('globalTxPower'),
-        globalK: document.getElementById('globalKIndex'),
-        globalA: document.getElementById('globalAIndex'),
-        globalSFI: document.getElementById('globalSFI'),
-        btnGenerate: document.getElementById('generateBtn'),
-        consoleOutput: document.getElementById('consoleOutput'),
-        helpModal: document.getElementById('helpModal'),
-        closeHelp: document.getElementById('closeHelp'),
-        versionCheckStatus: document.getElementById('versionCheckStatus')
-    };
+/*
+  SCRIPT STRUCTURE:
+  - setupDOMReferences()  -> collect DOM nodes
+  - init()                -> initialization flow
+  - loadContestDatabase() -> attempt to load contest mapping JSON (optional)
+  - analyzeCabrillo()     -> parse the pasted file and prepare UI
+  - renderHelpers()       -> build headers and preview table
+  - generateAdif()        -> build and download ADIF (no remote HTML download)
+  - checkForUpdate()      -> version check using GitHub Releases API (ONLY parses JSON & PNG, NEVER auto-downloads HTML)
 
+  All function and variable names are descriptive; internal comments are in English.
+*/
+
+document.addEventListener('DOMContentLoaded', () => {
+    const dom = setupDOMReferences();
+    // state
     let rawQsoLines = [], columnMapping = [], myCallsign = "YOURCALL", sampleColumns = [], qsoOverrides = new Map();
     let rawContestName = "", detectedContestId = null;
     let contestDatabase = {};
 
-    try {
-        const res = await fetch('https://raw.githubusercontent.com/rSignal86/smithlog/main/QRZContestID.json');
-        const data = await res.json();
-        contestDatabase = data.contests || {};
-        log(`Contest database loaded – ${Object.keys(contestDatabase).length} contests`);
-    } catch (e) {
-        log("Contest database offline – running in basic mode");
+    init();
+
+    // ----------------- DOM / setup -----------------
+    function setupDOMReferences() {
+        return {
+            input: document.getElementById('cabrilloInput'),
+            mappingArea: document.getElementById('mappingArea'),
+            globalSettingsArea: document.getElementById('globalSettingsArea'),
+            globalFieldsContainer: document.getElementById('globalFieldsContainer'),
+            contestSelect: document.getElementById('contestSelect'),
+            globalComment: document.getElementById('globalComment'),
+            headers: document.getElementById('columnHeaders'),
+            preview: document.getElementById('previewRows'),
+            globalTxPower: document.getElementById('globalTxPower'),
+            globalK: document.getElementById('globalKIndex'),
+            globalA: document.getElementById('globalAIndex'),
+            globalSFI: document.getElementById('globalSFI'),
+            btnGenerate: document.getElementById('generateBtn'),
+            consoleOutput: document.getElementById('consoleOutput'),
+            helpModal: document.getElementById('helpModal'),
+            closeHelp: document.getElementById('closeHelp'),
+            versionCheckStatus: document.getElementById('versionCheckStatus')
+        };
     }
 
+    //snitcher
     function log(msg) {
         const line = document.createElement('div');
         line.textContent = `[${new Date().toISOString().slice(11,19)}] ${msg}`;
@@ -239,49 +245,89 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (dom.consoleOutput.style.display === 'block') dom.consoleOutput.scrollTop = dom.consoleOutput.scrollHeight;
     }
 
-    document.getElementById('consoleBtn').onclick = () => {
-        const visible = dom.consoleOutput.style.display === 'block';
-        dom.consoleOutput.style.display = visible ? 'none' : 'block';
-        if (!visible) dom.consoleOutput.scrollTop = dom.consoleOutput.scrollHeight;
-    };
-    log("SmithLog ready!");
+    // ----------------- OS Booting -----------------
+    async function init() {
+        attachUIEvents();
+	log('ohh snap snithcher button has been pressed ');
+        log('SmithLogOS is booting.......');
+
+        // Load optional contest database but allow offline mode
+        await loadContestDatabase();
+        populateContestDropdown();
+
+        // Start safe version check (GitHub Releases).
+        checkForUpdate();
+        setInterval(checkForUpdate, 720 * 60 * 1000);
+    }
+
+    // ----------------- load optional contest DB -----------------
+    async function loadContestDatabase() {
+        try {
+            const res = await fetch('https://raw.githubusercontent.com/rSignal86/smithlog/main/QRZContestID.json');
+            if (!res.ok) throw new Error('Contest DB not available');
+            const data = await res.json();
+            contestDatabase = data.contests || {};
+            log(`Contest database loaded – ${Object.keys(contestDatabase).length} contests`);
+        } catch (err) {
+            log('Contest database offline – running in basic mode');
+            contestDatabase = {};
+        }
+    }
 
     function populateContestDropdown(selected = "") {
         dom.contestSelect.innerHTML = '<option value="">– Manual selection –</option>';
         Object.keys(contestDatabase).sort().forEach(id => {
-            const opt = document.createElement('option');
-            opt.value = id;
-            opt.textContent = `${id} – ${contestDatabase[id]}`;
+            const opt = document.createElement('option'); opt.value = id; opt.textContent = `${id} – ${contestDatabase[id]}`;
             if (id === selected) opt.selected = true;
             dom.contestSelect.appendChild(opt);
         });
     }
-    populateContestDropdown();
 
-    document.getElementById('helpBtn').onclick = () => dom.helpModal.style.display = 'flex';
-    dom.closeHelp.onclick = () => dom.helpModal.style.display = 'none';
-    dom.helpModal.onclick = (e) => { if (e.target === dom.helpModal) dom.helpModal.style.display = 'none'; };
+    // ----------------- attach UI events -----------------
+    function attachUIEvents() {
+        document.getElementById('uploadBtn').addEventListener('click', () => document.getElementById('fileInput').click());
+        document.getElementById('fileInput').addEventListener('change', e => {
+            const file = e.target.files[0]; if (!file) return;
+            log(`Loading: ${file.name}`);
+            const reader = new FileReader();
+            reader.onload = ev => { dom.input.value = ev.target.result; log('File loaded'); };
+            reader.readAsText(file);
+        });
 
-    document.getElementById('uploadBtn').addEventListener('click', () => document.getElementById('fileInput').click());
-    document.getElementById('fileInput').addEventListener('change', e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        log(`Loading: ${file.name}`);
-        const reader = new FileReader();
-        reader.onload = ev => { dom.input.value = ev.target.result; log("File loaded"); };
-        reader.readAsText(file);
-    });
+        document.getElementById('analyzeBtn').addEventListener('click', analyzeCabrillo);
+        dom.btnGenerate.addEventListener('click', generateAdif);
+        document.getElementById('clearBtn').addEventListener('click', () => confirm('Clear everything?') && location.reload());
 
-    document.getElementById('analyzeBtn').addEventListener('click', () => {
+        document.getElementById('consoleBtn').onclick = () => {
+            const visible = dom.consoleOutput.style.display === 'block';
+            dom.consoleOutput.style.display = visible ? 'none' : 'block';
+            if (!visible) dom.consoleOutput.scrollTop = dom.consoleOutput.scrollHeight;
+        };
+
+        document.getElementById('helpBtn').onclick = () => { dom.helpModal.style.display = 'flex'; dom.helpModal.setAttribute('aria-hidden','false'); };
+        dom.closeHelp.onclick = () => { dom.helpModal.style.display = 'none'; dom.helpModal.setAttribute('aria-hidden','true'); };
+        dom.helpModal.onclick = (e) => { if (e.target === dom.helpModal) { dom.helpModal.style.display = 'none'; dom.helpModal.setAttribute('aria-hidden','true'); } };
+
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+            document.querySelectorAll('.title-box').forEach(b => b.classList.remove('active'));
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'F4') { e.preventDefault(); document.getElementById('analyzeBtn').click(); }
+            if (e.key === 'F10' && !dom.btnGenerate.disabled) { e.preventDefault(); dom.btnGenerate.click(); }
+            if (e.key === 'Escape') document.getElementById('clearBtn').click();
+        });
+    }
+
+    // ----------------- analyze CABRILLO input -----------------
+    function analyzeCabrillo() {
         const text = dom.input.value.trim();
-        if (!text) return alert("Paste or upload a Cabrillo log first!");
+        if (!text) return alert('Paste or upload a Cabrillo log first!');
 
         const lines = text.split('\n');
         rawQsoLines = lines.filter(l => l.trim().startsWith('QSO:'));
-        if (rawQsoLines.length === 0) {
-            log("ERROR: No QSO lines found");
-            return alert("No QSO lines found!");
-        }
+        if (rawQsoLines.length === 0) { log('ERROR: No QSO lines found'); return alert('No QSO lines found!'); }
         log(`Found ${rawQsoLines.length} QSOs – showing ALL`);
 
         lines.forEach(l => {
@@ -299,15 +345,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         if (detectedContestId) {
-            dom.contestSelect.value = detectedContestId;
-            log(`Contest auto-detected: ${detectedContestId}`);
+            dom.contestSelect.value = detectedContestId; log(`Contest auto-detected: ${detectedContestId}`);
         } else if (rawContestName) {
-            if (!dom.globalComment.value) dom.globalComment.value = rawContestName;
-            log(`Contest not found: "${rawContestName}" → added to comment`);
+            if (!dom.globalComment.value) dom.globalComment.value = rawContestName; log(`Contest not found, crap: "${rawContestName}" → oh well i added it to comment`);
         }
 
         sampleColumns = rawQsoLines[0].trim().split(/\s+/).slice(1);
-        columnMapping = new Array(sampleColumns.length).fill("UNKNOWN");
+        columnMapping = new Array(sampleColumns.length).fill('UNKNOWN');
         qsoOverrides = new Map();
 
         buildColumnHeaders();
@@ -319,8 +363,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         dom.btnGenerate.disabled = false;
 
         log(`Analysis complete – ${rawQsoLines.length} QSOs displayed`);
-    });
+    }
 
+    // ----------------- header + preview rendering -----------------
     const TOOLTIPS = {
         "UNKNOWN": "Not mapped – click to assign",
         "CALL": "Other station's callsign",
@@ -347,47 +392,35 @@ document.addEventListener("DOMContentLoaded", async () => {
         sampleColumns.forEach((_, i) => {
             const th = document.createElement('th');
             const box = document.createElement('div'); box.className = 'title-box';
-            let guessed = i===0 ? "FREQ" : i===1 ? "MODE" : i===2 ? "QSO_DATE" : i===3 ? "TIME_ON" : i===4 ? "MY_CALLSIGN" : "UNKNOWN";
+            let guessed = i===0 ? 'FREQ' : i===1 ? 'MODE' : i===2 ? 'QSO_DATE' : i===3 ? 'TIME_ON' : i===4 ? 'MY_CALLSIGN' : 'UNKNOWN';
             columnMapping[i] = guessed; box.textContent = guessed;
-            if (guessed === "UNKNOWN") box.classList.add('unknown');
+            if (guessed === 'UNKNOWN') box.classList.add('unknown');
 
-            const dropdown = document.createElement('select'); dropdown.className = 'dropdown'; dropdown.size = 12;
+            const dropdown = document.createElement('select'); dropdown.className = 'dropdown'; dropdown.size = 10;
             Object.keys(TOOLTIPS).forEach(field => {
-                const opt = document.createElement('option');
-                opt.value = field; opt.textContent = field; opt.title = TOOLTIPS[field];
-                if (field === guessed) opt.selected = true;
-                dropdown.appendChild(opt);
+                const opt = document.createElement('option'); opt.value = field; opt.textContent = field; opt.title = TOOLTIPS[field];
+                if (field === guessed) opt.selected = true; dropdown.appendChild(opt);
             });
 
             dropdown.onchange = () => {
-                columnMapping[i] = dropdown.value;
-                box.textContent = dropdown.value;
-                box.classList.toggle('unknown', dropdown.value === "UNKNOWN");
-                dropdown.style.display = 'none';
-                box.classList.remove('active');
+                columnMapping[i] = dropdown.value; box.textContent = dropdown.value; box.classList.toggle('unknown', dropdown.value === 'UNKNOWN'); dropdown.style.display = 'none'; box.classList.remove('active');
             };
 
             box.onclick = e => {
                 e.stopPropagation();
                 document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
                 document.querySelectorAll('.title-box').forEach(b => b.classList.remove('active'));
-                box.classList.add('active');
-                dropdown.style.display = 'block';
-                dropdown.focus();
+                box.classList.add('active'); dropdown.style.display = 'block'; dropdown.focus();
             };
 
-            if (guessed !== "UNKNOWN") {
-                const auto = document.createElement('span'); auto.className = 'autoTag'; auto.textContent = 'AUTO';
-                th.appendChild(auto);
+            if (guessed !== 'UNKNOWN') {
+                const auto = document.createElement('span'); auto.className = 'autoTag'; auto.textContent = 'AUTO'; th.appendChild(auto);
             }
 
             th.appendChild(box); th.appendChild(dropdown); tr.appendChild(th);
         });
 
-        ["Comment","K-Index","A-Index","SFI"].forEach(title => {
-            const th = document.createElement('th'); th.textContent = title; th.style.background = "#003300";
-            tr.appendChild(th);
-        });
+        ['Comment','K-Index','A-Index','SFI'].forEach(title => { const th = document.createElement('th'); th.textContent = title; th.style.background = '#003300'; tr.appendChild(th); });
         dom.headers.appendChild(tr);
     }
 
@@ -396,30 +429,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         rawQsoLines.forEach((line, idx) => {
             const fields = line.trim().split(/\s+/).slice(1);
             const row = document.createElement('tr');
-            fields.forEach(f => {
-                const td = document.createElement('td'); td.textContent = f; row.appendChild(td);
-            });
-            ["Comment","K-Index","A-Index","SFI"].forEach(key => {
-                const td = document.createElement('td'); td.contentEditable = true;
-                const ov = qsoOverrides.get(idx) || {};
-                td.textContent = ov[key.toLowerCase()] || "";
-                td.onblur = () => {
-                    const val = td.textContent.trim();
-                    if (!qsoOverrides.has(idx)) qsoOverrides.set(idx, {});
-                    if (val) qsoOverrides.get(idx)[key.toLowerCase()] = val;
-                    else delete qsoOverrides.get(idx)[key.toLowerCase()];
-                };
+            fields.forEach(f => { const td = document.createElement('td'); td.textContent = f; row.appendChild(td); });
+            ['Comment','K-Index','A-Index','SFI'].forEach(key => {
+                const td = document.createElement('td'); td.contentEditable = true; const ov = qsoOverrides.get(idx) || {}; td.textContent = ov[key.toLowerCase()] || '';
+                td.onblur = () => { const val = td.textContent.trim(); if (!qsoOverrides.has(idx)) qsoOverrides.set(idx, {}); if (val) qsoOverrides.get(idx)[key.toLowerCase()] = val; else delete qsoOverrides.get(idx)[key.toLowerCase()]; };
                 row.appendChild(td);
             });
             dom.preview.appendChild(row);
         });
     }
 
-    dom.btnGenerate.addEventListener('click', () => {
+    // ----------------- generate ADIF (no remote HTML download) -----------------
+    function generateAdif() {
         log(`Generating ADIF with ${rawQsoLines.length} QSOs...`);
         const selectedContestId = dom.contestSelect.value || detectedContestId;
 
-        let adif = `SmithLog GHv1.0 Export – Made in Norway\n<ADIF_VER:5>3.1.4\n<CREATED_TIMESTAMP:${new Date().toISOString().replace(/[-:T.]/g,'').slice(0,14)}>\n<PROGRAMID:8>SmithLog\n<PROGRAMVERSION:10>GHv1.0\n<EOH>\n\n`;
+        let adif = `SmithLog GHv1.1 Export\n<ADIF_VER:5>3.1.4\n<CREATED_TIMESTAMP:${new Date().toISOString().replace(/[-:T.]/g,'').slice(0,14)}>#\n<PROGRAMID:8>SmithLog\n<PROGRAMVERSION:10>GHv1.1\n<EOH>\n\n`;
 
         let exported = 0;
         rawQsoLines.forEach((line, idx) => {
@@ -429,103 +454,129 @@ document.addEventListener("DOMContentLoaded", async () => {
             const record = {};
 
             values.forEach((val, i) => {
-                const field = columnMapping[i];
-                if (!field || field === "UNKNOWN") return;
-                let cleaned = val;
-                if (field === "FREQ") { const n = parseFloat(val); if (!isNaN(n)) cleaned = (n >= 1000 ? (n/1000) : n).toFixed(3).replace(/\.?0+$/, ''); }
-                if (field === "MODE") { const m = {PH:"SSB",RY:"RTTY",DG:"FT8",FT8:"FT8",FT4:"FT4",CW:"CW"}[val.toUpperCase()]; cleaned = m || val.toUpperCase(); }
-                if (field === "QSO_DATE") cleaned = val.replace(/-/g, '');
-                if (field === "TIME_ON") cleaned = val.padEnd(6,'0').slice(0,6);
-                if (field === "MY_CALLSIGN") cleaned = myCallsign;
+                const field = columnMapping[i]; if (!field || field === 'UNKNOWN') return; let cleaned = val;
+                if (field === 'FREQ') { const n = parseFloat(val); if (!isNaN(n)) cleaned = (n >= 1000 ? (n/1000) : n).toFixed(3).replace(/\.?0+$/, ''); }
+                if (field === 'MODE') { const m = {PH:'SSB',RY:'RTTY',DG:'FT8',FT8:'FT8',FT4:'FT4',CW:'CW'}[val.toUpperCase()]; cleaned = m || val.toUpperCase(); }
+                if (field === 'QSO_DATE') cleaned = val.replace(/-/g, '');
+                if (field === 'TIME_ON') cleaned = val.padEnd(6,'0').slice(0,6);
+                if (field === 'MY_CALLSIGN') cleaned = myCallsign;
                 record[field] = cleaned;
             });
 
             if (selectedContestId) record.CONTEST_ID = selectedContestId;
 
             const ov = qsoOverrides.get(idx) || {};
-            const comment = [dom.globalComment.value.trim(), ov.comment].filter(Boolean).join(" | ");
+            const comment = [dom.globalComment.value.trim(), ov.comment].filter(Boolean).join(' | ');
             if (comment) record.COMMENT = comment;
             if (dom.globalTxPower.value.trim() || ov.txpwr) record.TX_PWR = ov.txpwr || dom.globalTxPower.value.trim();
             if (dom.globalK.value.trim() || ov.k) record.K_INDEX = ov.k || dom.globalK.value.trim();
             if (dom.globalA.value.trim() || ov.a) record.A_INDEX = ov.a || dom.globalA.value.trim();
             if (dom.globalSFI.value.trim() || ov.sfi) record.SFI = ov.sfi || dom.globalSFI.value.trim();
 
-            record.CALL ||= "NOCALL"; record.QSO_DATE ||= "20000101"; record.TIME_ON ||= "000000"; record.MODE ||= "SSB";
+            record.CALL ||= 'NOCALL'; record.QSO_DATE ||= '20000101'; record.TIME_ON ||= '000000'; record.MODE ||= 'SSB';
 
-            let lineOut = "";
+            let lineOut = '';
             Object.keys(record).sort().forEach(k => lineOut += `<${k}:${record[k].length}>${record[k]} `);
-            adif += lineOut + "<EOR>\n";
+            adif += lineOut + '<EOR>\n';
             exported++;
         });
 
         const blob = new Blob([adif], {type: 'text/plain'});
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = `SmithLog_${new Date().toISOString().slice(0,10)}.adi`; a.click();
-        URL.revokeObjectURL(url);
+        const a = document.createElement('a'); a.href = url; a.download = `SmithLog_${new Date().toISOString().slice(0,10)}.adi`; a.click(); URL.revokeObjectURL(url);
 
-        log(`ADIF generated – ${exported} QSOs exported${selectedContestId ? ` (CONTEST_ID: ${selectedContestId})` : ""}`);
-    });
+        log(`ADIF generated – ${exported} QSOs exported${selectedContestId ? ` (CONTEST_ID: ${selectedContestId})` : ''}`);
+    }
 
-    document.addEventListener('click', () => {
-        document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
-        document.querySelectorAll('.title-box').forEach(b => b.classList.remove('active'));
-    });
+    // ----------------- safe update check via GitHub Releases API -----------------
 
-    document.getElementById('clearBtn').addEventListener('click', () => confirm("Clear everything?") && location.reload());
-
-    document.addEventListener('keydown', e => {
-        if (e.key === 'F4') { e.preventDefault(); document.getElementById('analyzeBtn').click(); }
-        if (e.key === 'F10' && !dom.btnGenerate.disabled) { e.preventDefault(); dom.btnGenerate.click(); }
-        if (e.key === 'Escape') document.getElementById('clearBtn').click();
-    });
-
-    // ======== OPPDATERT VERSJONSJEKKER MED BEDRE REGEX OG LOGGING ========
     async function checkForUpdate() {
-        const CURRENT_VERSION = "GHv1.0";
+        const CURRENT_VERSION = 'GHv1.1';
         const statusElement = dom.versionCheckStatus;
-        const repoUrl = "https://github.com/rSignal86/smithlog";
-        const checkUrl = `https://raw.githubusercontent.com/rSignal86/smithlog/main/SmithLog.html?t=${Date.now()}`; // Cache-busting
+        const apiUrl = 'https://api.github.com/repos/rSignal86/smithlog/releases/latest';
+        const repoUrl = 'https://github.com/rSignal86/smithlog';
 
-        log(`[VERSION CHECK] Starting check against ${checkUrl}`);
-        
+        log(`[VERSION CHECK] Querying GitHub Releases API: ${apiUrl}`);
         try {
-            const response = await fetch(checkUrl, { cache: "no-store" });
-            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-            
-            const text = await response.text();
-            log(`[VERSION CHECK] Fetched ${text.length} bytes successfully`);
+            const res = await fetch(apiUrl, { cache: 'no-store' });
+            if (!res.ok) throw new Error(`GitHub API error ${res.status}`);
+            const json = await res.json();
+            const latestTag = (json.tag_name || json.name || '').toString();
+            log(`[VERSION CHECK] Latest release tag/name: ${latestTag}`);
 
-            // Forbedret regex: Matcher "SmithLog GHvX.X" uansett strong eller ikke
-            const versionMatch = text.match(/SmithLog\s+(GHv\d+\.\d+)/i);
-            if (!versionMatch) {
-                log(`[VERSION CHECK] No version match found in HTML. Snippet: ${text.substring(text.indexOf('<footer>'), text.indexOf('</footer>') + 9)}`);
-                throw new Error("Version pattern not found");
-            }
+            if (!latestTag) throw new Error('No release tag/name found');
 
-            const latestVersion = versionMatch[1];
-            log(`[VERSION CHECK] Parsed latest: ${latestVersion} (local: ${CURRENT_VERSION})`);
-
-            if (latestVersion === CURRENT_VERSION) {
-                statusElement.innerHTML = '– You are on the latest version';
+            if (latestTag === CURRENT_VERSION) {
+                statusElement.innerHTML = '– yeee, latest version is used';
                 statusElement.style.color = '#00ff80';
-                log(`[VERSION CHECK] ✅ Up to date`);
-            } else {
-                statusElement.innerHTML = `– NEW VERSION! <a href="${repoUrl}" target="_blank" style="color:#ff6600; font-weight:bold; text-decoration:underline;">${latestVersion} → Update now!</a>`;
-                statusElement.style.color = '#ff6600';
-                log(`[VERSION CHECK] 🚨 Update available: ${latestVersion}`);
+                log('[VERSION CHECK] I told the user on the footer that the user is using the lates stuff');
+                return;
             }
+
+            // New release available — inspect assets but do NOT auto-download HTML files
+            statusElement.innerHTML = `– You are lucky now:`;
+            statusElement.style.color = '#ff6600';
+            log(`[VERSION CHECK] Update available: ${latestTag}`);
+
+            const assets = Array.isArray(json.assets) ? json.assets : [];
+            log(`[VERSION CHECK] Release contains ${assets.length} assets — will only consider .json and .png files`);
+
+            // Find json and png assets (if any)
+            const jsonAsset = assets.find(a => a.name && a.name.toLowerCase().endsWith('.json'));
+            const pngAsset = assets.find(a => a.name && a.name.toLowerCase().endsWith('.png'));
+
+            if (jsonAsset) {
+                log(`[VERSION CHECK] Found JSON asset: ${jsonAsset.name} — fetching and parsing`);
+                try {
+                    const r = await fetch(jsonAsset.browser_download_url, { cache: 'no-store' });
+                    if (r.ok) {
+                        const parsed = await r.json();
+                        // We only parse and log the high-level info — do not execute any instructions inside
+                        log(`[VERSION CHECK] Parsed JSON asset successfully (keys: ${Object.keys(parsed).slice(0,8).join(', ')})`);
+                    } else {
+                        log(`[VERSION CHECK] Failed to fetch JSON asset: HTTP ${r.status}`);
+                    }
+                } catch (e) {
+                    log(`[VERSION CHECK] Error fetching JSON asset: ${e.message}`);
+                }
+            } else {
+                log('[VERSION CHECK] No JSON asset found in release');
+            }
+
+            if (pngAsset) {
+                log(`[VERSION CHECK] Found PNG asset: ${pngAsset.name} — fetching as blob for preview (no execution)`);
+                try {
+                    const r = await fetch(pngAsset.browser_download_url, { cache: 'no-store' });
+                    if (r.ok) {
+                        const blob = await r.blob();
+                        const previewUrl = URL.createObjectURL(blob);
+                        // We don't insert it into DOM automatically, but provide a console message and keep the URL for optional use
+                        log('[VERSION CHECK] PNG asset fetched (preview available in console).');
+                        // Revoke after a short delay to avoid leaking resources in long-running sessions
+                        setTimeout(() => URL.revokeObjectURL(previewUrl), 60 * 1000);
+                    } else {
+                        log(`[VERSION CHECK] Failed to fetch PNG asset: HTTP ${r.status}`);
+                    }
+                } catch (e) {
+                    log(`[VERSION CHECK] Error fetching PNG asset: ${e.message}`);
+                }
+            } else {
+                log('[VERSION CHECK] No PNG asset found in release');
+            }
+
+            //Respect privacy.
+            log('[VERSION CHECK] Completed safe check.');
+
+            // Provide the user a link to the release so they can manually review and download if desired
+            statusElement.innerHTML += ` <a href="${repoUrl}/releases/latest" target="_blank" style="color:#ff6600; font-weight:bold; text-decoration:underline;">Click here to download ${latestTag} version</a>`;
+
         } catch (err) {
-            statusElement.innerHTML = `– Check failed (offline?)`;
+            statusElement.innerHTML = '– Update check failed';
             statusElement.style.color = '#888';
             log(`[VERSION CHECK] ❌ Error: ${err.message}`);
         }
     }
 
-    // Kjør sjekken
-    checkForUpdate();
-    setInterval(checkForUpdate, 5 * 60 * 1000);
-    // ============================================
 });
 </script>
 </body>
