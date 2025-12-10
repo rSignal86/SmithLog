@@ -81,8 +81,28 @@ No, I don't offer individual support if you have mapped your data incorrectly an
 You are responsible for mapping data for export.
 ---
 
-**Changelog:
-GHv1.0: A working version that you can use. There are some minor details to work on, but this version converts the data to the correct standard for uploading to QRZ.
+## Changelog
+
+**GHv1.1 – 2025-12-10** *(latest version)*
+
+- New compact and modern UI – significantly better on laptops, tablets and phones
+- Completely redesigned footer with larger Norway badge and prominent GitHub link
+- Version checker is now 100 % secure – uses GitHub Releases API (no longer downloads raw HTML)
+- Generated ADIF files are tagged with **SmithLog GHv1.1**
+- Smaller buttons, fonts and spacing for a cleaner look on smaller screens
+- Improved accessibility (ARIA attributes added)
+- Scrollable help modal on small devices
+- Minor humorous console messages for curious users
+- Reduced network usage – update check now checks only every 12 hours
+
+**GHv1.0 – 2025-12-09**
+
+- First public release
+- Fully functional Cabrillo → ADIF converter
+- Automatic contest detection with fallback to comment
+- Interactive column mapping (including STX/SRX and STX_STRING/SRX_STRING)
+- Global optional fields: TX Power, K-Index, A-Index, SFI and comment
+- Initial version checking (via raw HTML download)
 
 ## License
 MIT (see `LICENSE` in the repo).
