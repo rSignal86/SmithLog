@@ -8,7 +8,6 @@ A lightweight, browser-based tool built *by a ham, for hams* to convert contest 
 
 I'm not saying that SmithLog is the best program in the world to do this, there are other programs that do a very good job and offer more flexibility.
 ADIF Master and Contest LogChecker are better for heavy post-Processing, while my program does something specific like converting data without having a program installed on your computer, plus it's the same program across all devices you use since everything is in a single HTML file.
----
 
 ## Features
 
