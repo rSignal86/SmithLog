@@ -98,10 +98,17 @@ You are responsible for mapping data for export.
 
 - First public release
 - Fully functional Cabrillo → ADIF converter
-- Automatic contest detection with fallback to comment
-- Interactive column mapping (including STX/SRX and STX_STRING/SRX_STRING)
-- Global optional fields: TX Power, K-Index, A-Index, SFI and comment
-- Initial version checking (via raw HTML download)
+
+## ScreenShots
+
+here is some images of the program:
+
+When you start (https://github.com/rSignal86/SmithLog/blob/main/assets/screenshot/OnBoot.png)
+
+Before you have analyzed the Cabrillo file (https://github.com/rSignal86/SmithLog/blob/main/assets/screenshot/BeforeAnalyze.png)
+
+After you have analyzed the Cabrillo file (https://github.com/rSignal86/SmithLog/blob/main/assets/screenshot/AfterAnazlye.png)
+
 
 ## License
 MIT (see `LICENSE` in the repo).
