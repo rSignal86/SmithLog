@@ -103,11 +103,19 @@ You are responsible for mapping data for export.
 
 here is some images of the program:
 
-When you start (https://github.com/rSignal86/SmithLog/blob/main/assets/screenshot/OnBoot.png)
+### When you start the program 
 
-Before you have analyzed the Cabrillo file (https://github.com/rSignal86/SmithLog/blob/main/assets/screenshot/BeforeAnalyze.png)
+![Image alt](https://github.com/rSignal86/SmithLog/blob/main/assets/screenshot/OnBoot.png)
 
-After you have analyzed the Cabrillo file (https://github.com/rSignal86/SmithLog/blob/main/assets/screenshot/AfterAnazlye.png)
+
+### Before you have analyzed the Cabrillo file 
+![Image alt](https://github.com/rSignal86/SmithLog/blob/main/assets/screenshot/BeforeAnalyze.png)
+
+
+### After you have analyzed the Cabrillo file 
+
+![Image alt](https://github.com/rSignal86/SmithLog/blob/main/assets/screenshot/AfterAnazlye.png)
+
 
 
 ## License
