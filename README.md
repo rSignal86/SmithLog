@@ -2,6 +2,8 @@
 
 A lightweight, browser-based tool built *by a ham, for hams* to convert contest logs from **Cabrillo** format to **ADIF**, ready for uploading to QRZ.
 
+## Download link: [Click here to download SmithLog](https://github.com/rSignal86/SmithLog/archive/refs/heads/main.zip)
+
 ---
 
 ## Why SmithLog?
