@@ -15,7 +15,7 @@ ADIF Master and Contest LogChecker are better for heavy post-Processing, while m
 
 - **Automatic contest detection** with provision for comments.
 - **Quick and easy**: Paste or upload your Cabrillo log, click **Analyze (F4)**, then **Generate ADIF (F10)**. Done.
-- **ADIF 3.1.6 compliant**: Outputs ADIF according to the latest published specification.
+- **ADIF 3.1.7 compliant**: Outputs ADIF according to the latest published specification.
 - **Smart Contest Detection**: Automatically identifies `CONTEST_ID`. If unknown, the contest name is added as a comment.
 - **Interactive Column Mapping**: Click on yellow "unknown" headers to map to the correct ADIF fields (e.g. `STX`, `SRX`, `STX_STRING`, `SRX_STRING`).
 - **Propagation and Meta Fields**: Optional global fields for `TX_PWR`, `K_INDEX`, `A_INDEX`, `SFI` and a global comment to be added to the QSO to QRZ.
@@ -47,14 +47,14 @@ There are several excellent tools for Cabrillo → ADIF conversion:
 
 1. **Browser-based, no installation** Works on macOS/Linux without admin rights.
 2. **Intuitive mapping for contest Exchanges, it only shows you want you need.
-3. **ADIF 3.1.6 compliance by design** Ensures modern compatibility with QRZ and other services.
+3. **ADIF 3.1.7 compliance by design** Ensures modern compatibility with QRZ and other services.
 4. **Simple tool that do one thing.
 
 ---
 
 ## Format references
 
-- **ADIF 3.1.6**: https://adif.org/316/ADIF_316.htm
+- **ADIF 3.1.7**: https://adif.org/317/ADIF_317.htm
 - **Cabrillo v3**: https://wwrof.org/cabrillo/cabrillo-v3-header/
 
 ---
@@ -83,8 +83,10 @@ You are responsible for mapping data for export.
 ---
 
 ## Changelog
+**GHv1.2 – 2025-05-23** *(latest version)*
+- YO3JW discovered a small bug where my_callsign should not be used but STATION_CALLSIGN is for the new standard. YO3JW also had the idea of ​​including STATION_CALLSIGN as part of the filename. This is a good idea. Credit to YO3JW.
 
-**GHv1.1 – 2025-12-10** *(latest version)*
+**GHv1.1 – 2025-12-10**
 
 - New compact and modern UI – significantly better on laptops, tablets and phones
 - Completely redesigned footer with larger Norway badge and prominent GitHub link
