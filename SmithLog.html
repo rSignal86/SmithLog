@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "NAME": "Operator name",
         "GRID": "Maidenhead locator",
         "STATE": "US state / province",
-        "MY_CALLSIGN": "Your callsign",
+        "STATION_CALLSIGN": "Your callsign",
         "TX_PWR": "Your TX power"
     };
 
@@ -390,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sampleColumns.forEach((_, i) => {
             const th = document.createElement('th');
             const box = document.createElement('div'); box.className = 'title-box';
-            let guessed = i===0 ? 'FREQ' : i===1 ? 'MODE' : i===2 ? 'QSO_DATE' : i===3 ? 'TIME_ON' : i===4 ? 'MY_CALLSIGN' : 'UNKNOWN';
+            let guessed = i===0 ? 'FREQ' : i===1 ? 'MODE' : i===2 ? 'QSO_DATE' : i===3 ? 'TIME_ON' : i===4 ? 'STATION_CALLSIGN' : 'UNKNOWN';
             columnMapping[i] = guessed; box.textContent = guessed;
             if (guessed === 'UNKNOWN') box.classList.add('unknown');
 
@@ -442,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
         log(`Generating ADIF with ${rawQsoLines.length} QSOs...`);
         const selectedContestId = dom.contestSelect.value || detectedContestId;
 
-        let adif = `SmithLog GHv1.1 Export\n<ADIF_VER:5>3.1.4\n<CREATED_TIMESTAMP:${new Date().toISOString().replace(/[-:T.]/g,'').slice(0,14)}>#\n<PROGRAMID:8>SmithLog\n<PROGRAMVERSION:10>GHv1.1\n<EOH>\n\n`;
+        let adif = `SmithLog GHv1.2 Export\n<ADIF_VER:5>3.1.7\n<CREATED_TIMESTAMP:${new Date().toISOString().replace(/[-:T.]/g,'').slice(0,14)}>#\n<PROGRAMID:8>SmithLog\n<PROGRAMVERSION:10>GHv1.2\n<EOH>\n\n`;
 
         let exported = 0;
         rawQsoLines.forEach((line, idx) => {
@@ -457,7 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (field === 'MODE') { const m = {PH:'SSB',RY:'RTTY',DG:'FT8',FT8:'FT8',FT4:'FT4',CW:'CW'}[val.toUpperCase()]; cleaned = m || val.toUpperCase(); }
                 if (field === 'QSO_DATE') cleaned = val.replace(/-/g, '');
                 if (field === 'TIME_ON') cleaned = val.padEnd(6,'0').slice(0,6);
-                if (field === 'MY_CALLSIGN') cleaned = myCallsign;
+                if (field === 'STATION_CALLSIGN') cleaned = myCallsign;
                 record[field] = cleaned;
             });
 
@@ -479,9 +479,16 @@ document.addEventListener('DOMContentLoaded', () => {
             exported++;
         });
 
-        const blob = new Blob([adif], {type: 'text/plain'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = `SmithLog_${new Date().toISOString().slice(0,10)}.adi`; a.click(); URL.revokeObjectURL(url);
+const blob = new Blob([adif], {type: 'text/plain'});
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a'); a.href = url;
+
+// Henter kallesignalet som ble oppdaget under analysen (eller bruker "MYCALL" som reserve)
+const fileCallsign = (myCallsign && myCallsign !== "YOURCALL") ? myCallsign.trim().toUpperCase() : "MYCALL";
+
+a.download = `SmithLog_${fileCallsign}_${new Date().toISOString().slice(0,10)}.adi`;
+a.click();
+URL.revokeObjectURL(url);
 
         log(`ADIF generated – ${exported} QSOs exported${selectedContestId ? ` (CONTEST_ID: ${selectedContestId})` : ''}`);
     }
@@ -489,7 +496,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------- safe update check via GitHub Releases API -----------------
 
     async function checkForUpdate() {
-        const CURRENT_VERSION = 'GHv1.1';
+        const CURRENT_VERSION = 'GHv1.2';
         const statusElement = dom.versionCheckStatus;
         const apiUrl = 'https://api.github.com/repos/rSignal86/smithlog/releases/latest';
         const repoUrl = 'https://github.com/rSignal86/smithlog';
@@ -579,4 +586,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-
